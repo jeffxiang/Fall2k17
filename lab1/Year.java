@@ -1,10 +1,11 @@
 /** Class that determines whether or not a year is a leap year.
- *  @author YOUR NAME HERE
+ *  @author Jeff Xiang
  */
 public class Year {
 
     /** Return true iff YEAR is a leap year.  */
     static boolean isLeapYear(int year) {
+      if ((year % 400 == 0) or ((year % 4 == 0) and (year % 100 != 0)))
         return true;    // YOUR CODE HERE
     }
 
@@ -36,4 +37,3 @@ public class Year {
     }
 
 }
-
