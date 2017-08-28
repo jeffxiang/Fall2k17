@@ -57,7 +57,7 @@ public class hw0 {
 
   public static void main(String[] args) {
     int[] testarray = {5,1,0,3,6};
-    boolean result = threesum(testarray);
+    int result = max_forloop(testarray);
     System.out.println(result);
   }
 }
