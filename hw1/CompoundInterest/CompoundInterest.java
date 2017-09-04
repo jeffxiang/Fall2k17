@@ -7,7 +7,7 @@ public class CompoundInterest {
     static final int THIS_YEAR = 2015;
 
     /** Return the number of years between TARGETYEAR and THIS_YEAR,
-     *  e.g. if THIS_YEAR is 2014 and TARGETYEAR is 2016, the result
+     *  e.g. if THIS_YEAR is 2015 and TARGETYEAR is 2016, the result
      *  should be 1. Throughout the assignment it is OK to assume that
      *  TARGETYEAR is >= THIS_YEAR. */
     static int numYears(int targetYear) {
