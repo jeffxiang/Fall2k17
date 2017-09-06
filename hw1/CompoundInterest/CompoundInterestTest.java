@@ -5,8 +5,8 @@ public class CompoundInterestTest {
 
     @Test
     public void testNumYears() {
-        assertEquals(CompoundInterest.numYears(2017), 1);
-        assertEquals(CompoundInterest.numYears(2020), 4);
+        assertEquals(CompoundInterest.numYears(2017), 2);
+        assertEquals(CompoundInterest.numYears(2020), 5);
     }
 
     @Test
