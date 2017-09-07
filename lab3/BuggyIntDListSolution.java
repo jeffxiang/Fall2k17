@@ -30,7 +30,12 @@ public class BuggyIntDListSolution extends IntDList {
         } else {
             _back = p._prev;
         }
-        p._prev._next = p._next;
+        if (p._prev == null) {
+            _front = p._next;
+        }
+        else {
+            p._prev._next = p._next;
+        }
     }
     public String getException() {
         //hint : this is what comes after the "java.lang" at the top of the stack trace

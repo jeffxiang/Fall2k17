@@ -6,7 +6,9 @@ import org.junit.Test;
 
 public class IntDListTest {
 
+
     /** Tests the constructor and size operations. */
+
     @Test
     public void testSize() {
         IntDList d;
@@ -17,8 +19,10 @@ public class IntDListTest {
         d = new IntDList(5, 1, 0);
         assertEquals("Size of 3-element list", 3, d.size());
     }
+
         
     /** Test front and back. */
+
     @Test
     public void testFrontBack() {
         IntDList d = new IntDList(5, 10, 15, 20);
@@ -26,7 +30,9 @@ public class IntDListTest {
         assertEquals("getBack", 20, d.getBack());
     }
 
+
     /** Tests the get operation. */
+
     @Test
     public void testGet() {
         IntDList d = new IntDList(5, 10, 15, 20);
@@ -40,6 +46,7 @@ public class IntDListTest {
         assertEquals(".get(-3)", 10, d.get(-3));
         assertEquals(".get(-4)", 5, d.get(-4));
     }
+
 
     /** Test insertBack and insertFront. */
     @Test

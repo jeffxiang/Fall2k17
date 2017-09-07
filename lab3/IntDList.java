@@ -27,22 +27,59 @@ public class IntDList {
     /** Return value #I in this list, where item 0 is the first, 1 is the
      *  second, ...., -1 is the last, -2 the second to last.... */
     public int get(int i) {
-        return 0;   // Your code here
+        DNode curr = _front;
+        DNode curr2 = _back;
+      if (i >= 0) {
+        while (i > 0) {
+          curr = curr._next;
+          i -= 1;
+        }
+        return curr._val;
+      }
+      else {
+        while (i < -1) {
+          curr2 = curr2._prev;
+          i++;
+        }
+        return curr2._val;
+      }
     }
 
     /** The length of this list. */
     public int size() {
-        return 0;   // Your code here
+        int i = 0;
+        DNode curr = _front;
+        while (curr != null) {
+          curr = curr._next;
+          i++;
+        }
+        return i;
     }
 
     /** Adds D to the front of the IntDList. */
     public void insertFront(int d) {
-        // Your code here 
+        if (_front == null) {
+          DNode newfront = new DNode(d);
+          _front = newfront;
+          _back = newfront;
+        }
+        else {
+          DNode newfront = new DNode(null, d, _front);
+          _front._prev = newfront;
+          _front = newfront;
+        }
     }
 
     /** Adds D to the back of the IntDList. */
     public void insertBack(int d) {
-        // Your code here 
+      if (_back == null) {
+        insertFront(d);
+      }
+      else {
+        DNode newback = new DNode(_back, d, null);
+        _back._next = newback;
+        _back = newback;
+      }
     }
 
     /** Removes the last item in the IntDList and returns it.
@@ -53,7 +90,7 @@ public class IntDList {
     }
 
     /** Returns a string representation of the IntDList in the form
-     *  [] (empty list) or [1, 2], etc. 
+     *  [] (empty list) or [1, 2], etc.
      * This is an extra challenge problem. */
     public String toString() {
         return null;   // Your code here
