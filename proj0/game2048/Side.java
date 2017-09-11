@@ -13,7 +13,7 @@ enum Side {
      *          lower-left corner of the reoriented board (where s is the
      *          board size), and
      *        * If (c, r) are the standard coordinates of a certain
-     *          square on the reoriented board, then (c+DCOL, r+DROW)
+     *          square on the reoriented board, then (c+DROW, r+DCOL)
      *          are the standard coordinates of the squares immediately
      *          above it on the reoriented board.
      *  The idea behind going to this trouble is that by using the
@@ -49,6 +49,7 @@ enum Side {
     int row(int c, int r, int size) {
         return _row0 * (size - 1) - c * _dcol + r * _drow;
     }
+
 
     /** Parameters describing this Side, as documented in the comment at the
      *  start of this class. */

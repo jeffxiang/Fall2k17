@@ -30,27 +30,26 @@ public class Game {
                 _model.addTile(getValidNewTile());
                 _model.notifyObservers();
             }
-
             boolean moved;
             moved = false;
             while (!moved) {
                 String cmnd = _source.getKey();
                 switch (cmnd) {
-                case "Quit":
-                    _playing = false;
-                    return;
-                case "New Game":
-                    return;
-                case "Up": case "Down": case "Left": case "Right":
-                    if (!_model.gameOver() && _model.tilt(keyToSide(cmnd))) {
-                        _model.notifyObservers();
-                        moved = true;
-                    }
-                    break;
-                default:
-                    break;
+                    case "Quit":
+                        _playing = false;
+                        return;
+                    case "New Game":
+                        return;
+                    case "Up": case "Down": case "Left": case "Right":
+                    case "\u2190": case "\u2191": case "\u2192": case "\u2193":
+                        if (!_model.gameOver() && _model.tilt(keyToSide(cmnd))) {
+                            _model.notifyObservers();
+                            moved = true;
+                        }
+                        break;
+                    default:
+                        break;
                 }
-
             }
         }
     }
@@ -59,16 +58,16 @@ public class Game {
      *  or "Right"). */
     private Side keyToSide(String key) {
         switch (key) {
-        case "Up":
-            return NORTH;
-        case "Down":
-            return SOUTH;
-        case "Left":
-            return WEST;
-        case "Right":
-            return EAST;
-        default:
-            throw new IllegalArgumentException("unknown key designation");
+            case "Up": case "\u2191":
+                return NORTH;
+            case "Down": case "\u2193":
+                return SOUTH;
+            case "Left": case "\u2190":
+                return WEST;
+            case "Right": case "\u2192":
+                return EAST;
+            default:
+                throw new IllegalArgumentException("unknown key designation");
         }
     }
 
@@ -76,7 +75,15 @@ public class Game {
      *  one that fits on the current board. Assumes there is at least one
      *  empty square on the board. */
     private Tile getValidNewTile() {
-        return null; // FIXME
+        Tile candidate = _source.getNewTile(_model.size());
+        int candcol = candidate.col();
+        int candrow = candidate.row();
+        if (_model.tile(candcol, candrow) == null) {
+            return candidate;
+        }
+        else {
+            return getValidNewTile();
+        }
     }
 
     /** Strings representing the four arrow keys. */

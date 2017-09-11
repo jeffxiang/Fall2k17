@@ -79,14 +79,69 @@ class Model extends Observable {
         boolean changed;
         changed = false;
 
-        // FIXME
+        for (int c = 0; c < size(); c++) {
+            int spcount = 0;
+            for (int r = size()-1; r >= 0; r--) {
+                int stcol = side.col(c, r, size());
+                int strow = side.row(c, r, size());
+                Tile tile1 = _board[stcol][strow];
+                if (tile1 == null) {
+                    spcount++;
+                }
+                else {
+                    int targetrow = r+spcount;
+                    setVtile(c, targetrow, side, tile1);
+                    if (r != targetrow) {
+                        changed = true;
+                    }
+                }
+            }
+        }
 
-        checkGameOver();
+       for (int c = 0; c < size(); c++) {
+            for (int r = size()-1; r >= 0; r--) {
+                int stcol = side.col(c, r, size());
+                int strow = side.row(c, r, size());
+                Tile currtile = _board[stcol][strow];
+                if (r > 0) {
+                    Tile adjtile = _board[side.col(c, r - 1, size())][side.row(c, r - 1, size())];
+                    if (currtile != null && adjtile != null) {
+                        if (currtile.value() == adjtile.value()) {
+                            setVtile(c, r, side, adjtile);
+                            int newtilestcol = side.col(c, r, size());
+                            int newtilestrow = side.row(c, r, size());
+                            int newtileval = _board[newtilestcol][newtilestrow].value();
+                            _score = _score + newtileval;
+                            changed = true;
+                            int spcount1 = 0;
+                            for (int r1 = r-1; r1 >= 0; r1--) {
+                                int stcol1 = side.col(c, r1, size());
+                                int strow1 = side.row(c, r1, size());
+                                Tile tile2 = _board[stcol1][strow1];
+                                if (tile2 == null) {
+                                    spcount1++;
+                                }
+                                else {
+                                    int targetrow = r1+spcount1;
+                                    setVtile(c, targetrow, side, tile2);
+                                    changed = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+       }
+       checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
     }
+
+
+
+
 
     /** Return the current Tile at (COL, ROW), when sitting with the board
      *  oriented so that SIDE is at the top (farthest) from you. */
@@ -97,26 +152,86 @@ class Model extends Observable {
     /** Move TILE to (COL, ROW), merging with any tile already there,
      *  where (COL, ROW) is as seen when sitting with the board oriented
      *  so that SIDE is at the top (farthest) from you. */
-    private void setVtile(int col, int row, Side side, Tile tile) {
+    private void setVtile(int col, int row, Side side, Tile tile) { /* TILE is the tile we want to move */
         int pcol = side.col(col, row, size()),
-            prow = side.row(col, row, size());
+            prow = side.row(col, row, size()); /* pcol,prow = target position */
         if (tile.col() == pcol && tile.row() == prow) {
-            return;
+            return; /* if tile is at target position, do nothing */
         }
-        Tile tile1 = vtile(col, row, side);
-        _board[tile.col()][tile.row()] = null;
+        Tile tile1 = vtile(col, row, side); /* tile1 is the tile at target position */
+        _board[tile.col()][tile.row()] = null; /* nullify TILE position */
 
         if (tile1 == null) {
-            _board[pcol][prow] = tile.move(pcol, prow);
+            _board[pcol][prow] = tile.move(pcol, prow); /* if target position is null, move tile to that position */
         } else {
-            _board[pcol][prow] = tile.merge(pcol, prow, tile1);
+            _board[pcol][prow] = tile.merge(pcol, prow, tile1); /* else, merge the two tiles */
         }
     }
 
-    /** Deternmine whether game is over and update _gameOver and _maxScore
+    /** Determine whether game is over and update _gameOver and _maxScore
      *  accordingly. */
     private void checkGameOver() {
-        // FIXME
+        for (int c = 0; c < size(); c++) {
+            for (int r = 0; r < size(); r++) {
+                Tile currtile = _board[c][r];
+                if (currtile == null) {
+                    return;
+                }
+                if (currtile != null) {
+                    if (currtile.value() == 2048) {
+                        _gameOver = true;
+                        if (_score > _maxScore) {
+                            _maxScore = _score;
+                        }
+                    }
+                    if (exist(c + 1)) {
+                        Tile righttile = _board[c + 1][r];
+                        if (righttile != null) {
+                            if (righttile.value() == currtile.value()) {
+                                return;
+                            }
+                        }
+                    }
+                    if (exist(c - 1)) {
+                        Tile lefttile = _board[c - 1][r];
+                        if (lefttile != null) {
+                            if (lefttile.value() == currtile.value()) {
+                                return;
+                            }
+                        }
+                    }
+                    if (exist(r + 1)) {
+                        Tile uptile = _board[c][r + 1];
+                        if (uptile != null) {
+                            if (uptile.value() == currtile.value()) {
+                                return;
+                            }
+                        }
+                    }
+                    if (exist(r - 1)) {
+                        Tile downtile = _board[c][r - 1];
+                        if (downtile != null) {
+                            if (downtile.value() == currtile.value()) {
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        _gameOver = true;
+        if (_score > _maxScore) {
+            _maxScore = _score;
+        }
+    }
+
+    /** Returns True if col or row exists */
+
+    boolean exist(int a) {
+        if (a >= 0 && a < size()) {
+            return true;
+        }
+        return false;
     }
 
     @Override
