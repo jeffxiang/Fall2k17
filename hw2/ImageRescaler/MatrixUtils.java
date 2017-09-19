@@ -4,6 +4,8 @@
  *  @author Josh Hug and YOU
  */
 
+import java.util.Collections;
+
 public class MatrixUtils {
     /** enum for specifying vertical vs. horizontal orientation
      *  You can use this, for example, by writing Orientation x = VERTICAL
@@ -16,6 +18,19 @@ public class MatrixUtils {
      */
 
     static enum Orientation { VERTICAL, HORIZONTAL };
+
+    /** Returns e[r][c] if r and c are valid.
+     * Returns Double.POSITIVE_INFINITY otherwise */
+        public static double get(double[][] e, int r, int c) {
+            int num_rows = e.length;
+            int num_cols = e[0].length;
+            if (r < num_rows && c < num_cols && r >= 0 && c >= 0) {
+                return e[r][c];
+            }
+            else {
+                return Double.POSITIVE_INFINITY;
+            }
+        }
 
     /** Non-destructively accumulates an energy matrix in the vertical
      *  direction.
@@ -53,7 +68,32 @@ public class MatrixUtils {
      */
 
     public static double[][] accumulateVertical(double[][] m) {
-        return null; //your code here
+        double[][] m2 = copy(m);
+        double[][] result = new double[m.length][m[0].length];
+        for (int r = 0; r < result.length; r++) {
+            for (int c = 0; c < result[0].length; c++) {
+                double currval = m2[r][c];
+                double upval = get(result, r-1, c);
+                double upleftval = get(result, r-1, c-1);
+                double uprightval = get(result, r-1, c+1);
+                double valcompare = 0;
+                if (upval != Double.POSITIVE_INFINITY) {
+                    valcompare = upval;
+                }
+                if (upleftval != Double.POSITIVE_INFINITY) {
+                    if (upleftval < valcompare) {
+                        valcompare = upleftval;
+                    }
+                }
+                if (uprightval != Double.POSITIVE_INFINITY) {
+                    if (uprightval < valcompare) {
+                        valcompare = uprightval;
+                    }
+                }
+                result[r][c] = currval + valcompare;
+            }
+        }
+        return result;
     }
 
     /** Non-destructively accumulates a matrix M along the specified
@@ -79,8 +119,22 @@ public class MatrixUtils {
      *
      */
 
+    public static double[][] transpose(double[][] m) {
+        double[][] mT = new double[m[0].length][m.length];
+        for (int r = 0; r < m[0].length; r++) {
+            for (int c = 0; c < m.length; c++) {
+                mT[r][c] = m[c][r];
+            }
+        }
+        return mT;
+    }
+
     public static double[][] accumulate(double[][] m, Orientation orientation) {
-        return null; //your code here
+        if (orientation == Orientation.HORIZONTAL) {
+            double[][] mT = transpose(m);
+            return transpose(accumulateVertical(mT));
+        }
+        return accumulateVertical(m);
     }
 
     /** Finds the vertical seam VERTSEAM of the given matrix M.
