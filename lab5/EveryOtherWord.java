@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import static org.junit.Assert.*;
 
 /**
- *  @author You, mostly
+ *  @author Jeff Xiang
  */
 
 public class EveryOtherWord {
@@ -22,7 +22,13 @@ public class EveryOtherWord {
       */
 
     public static Iterable<String> everyOtherWord(List<String> L) {
-        return null; // FIXME!
+        List<String> sofar = new ArrayList<>();
+        for (int i = 0; i < L.size(); i=i+2) {
+            if (!sofar.contains(L.get(i))) {
+                sofar.add(L.get(i));
+            }
+        }
+        return sofar;
     }
 
     /** Tests whether or not your everyOtherWord method works correctly. */
