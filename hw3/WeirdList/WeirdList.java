@@ -1,18 +1,23 @@
 /** A WeirdList holds a sequence of integers.
- * @author
+ * @author Jeff Xiang
  */
 public class WeirdList {
+    private int head;
+    private WeirdList tail;
+
     /** The empty sequence of integers. */
-    public static final WeirdList EMPTY =
-        null;  // REPLACE THIS LINE WITH THE RIGHT ANSWER.
+    public static final WeirdList EMPTY = new EmptyWeirdList(0, null);
 
     /** A new WeirdList whose head is HEAD and tail is TAIL. */
-    public WeirdList(int head, WeirdList tail) { /* FILL IN */ }
+    public WeirdList(int head, WeirdList tail) {
+        this.head = head;
+        this.tail = tail;
+    }
 
     /** Returns the number of elements in the sequence that
      *  starts with THIS. */
     public int length() {
-        return 0;  // REPLACE THIS LINE WITH THE RIGHT ANSWER.
+        return this.tail.length() + 1;
     }
 
     /** Return a string containing my contents as a sequence of numerals
@@ -20,13 +25,13 @@ public class WeirdList {
      *  5, 4, and 2, this returns " 5 4 2". */
     @Override
     public String toString() {
-        return ""; // REPLACE THIS LINE WITH THE RIGHT ANSWER.
+        return " " + this.head + this.tail.toString();
     }
 
     /** Part 3b: Apply FUNC.apply to every element of THIS WeirdList in
      *  sequence, and return a WeirdList of the resulting values. */
     public WeirdList map(IntUnaryFunction func) {
-        return null;  // REPLACE THIS LINE WITH THE RIGHT ANSWER.
+        return new WeirdList(func.apply(this.head),this.tail.map(func));
     }
 
     /*
@@ -63,6 +68,27 @@ public class WeirdList {
 
 }
 
+class EmptyWeirdList extends WeirdList {
+
+    public EmptyWeirdList(int head, WeirdList tail) {
+        super(head, tail);
+    }
+
+    @Override
+    public int length() {
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return "";
+    }
+
+    @Override
+    public WeirdList map(IntUnaryFunction func) {
+        return this;
+    }
+}
 
 
 
