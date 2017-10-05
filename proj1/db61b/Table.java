@@ -40,8 +40,8 @@ class Table {
         }
 
         // FIXME
-        _titles = null;
-        _columns = null;
+        _titles = columnTitles;
+        _columns = new ValueList[_rowSize];
     }
 
     /** A new Table whose columns are give by COLUMNTITLES. */
@@ -51,40 +51,73 @@ class Table {
 
     /** Return the number of columns in this table. */
     public int columns() {
-        return 0;  // REPLACE WITH SOLUTION
+        return this._rowSize;
     }
 
     /** Return the title of the Kth column.  Requires 0 <= K < columns(). */
     public String getTitle(int k) {
-        return null;  // REPLACE WITH SOLUTION
+        if (k >= this.columns()) {
+            throw error("index error");
+        }
+        return this._titles[k];
     }
 
     /** Return the number of the column whose title is TITLE, or -1 if
      *  there isn't one. */
     public int findColumn(String title) {
-        return -1;  // REPLACE WITH SOLUTION
+        for (int i = 0; i < this._titles.length; i++) {
+            if (this._titles[i].equals(title)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /** Return the number of rows in this table. */
     public int size() {
-        return 0;  // REPLACE WITH SOLUTION
+        return this._columns[0].size();
     }
 
     /** Return the value of column number COL (0 <= COL < columns())
      *  of record number ROW (0 <= ROW < size()). */
     public String get(int row, int col) {
         try {
-            return null; // REPLACE WITH SOLUTION
+            return this._columns[col].get(row);
         } catch (IndexOutOfBoundsException excp) {
             throw error("invalid row or column");
         }
     }
 
+
     /** Add a new row whose column values are VALUES to me if no equal
      *  row already exists.  Return true if anything was added,
      *  false otherwise. */
     public boolean add(String[] values) {
-        return false;   // REPLACE WITH SOLUTION
+        boolean existequalrow = false;
+        if (this._columns[0] != null) {
+            for (int row = 0; row < this._columns[0].size(); row++) {
+                if (values[0].equals(this._columns[0].get(row))) {
+                    for (int col = 0; col < this._columns.length; col++) {
+                        if (!values[col].equals(this._columns[col].get(row))) {
+                            break;
+                        }
+                        else if (col == this._columns.length-1 && values[col].equals(this._columns[col].get(row))) {
+                            existequalrow = true;
+                        }
+                    }
+                }
+            }
+            if (existequalrow) {
+                return false;
+            }
+        }
+        for (int i = 0; i < this._columns.length; i++) {
+            if (this._columns[i] == null) {
+                this._columns[i] = new ValueList();
+            }
+            this._columns[i].add(values[i]);
+        }
+        return true;
     }
 
     /** Add a new row whose column values are extracted by COLUMNS from
@@ -93,7 +126,13 @@ class Table {
      *  Column.getFrom(Integer...) for a description of how Columns
      *  extract values. */
     public boolean add(List<Column> columns, Integer... rows) {
-        return false;   // REPLACE WITH SOLUTION
+        String[] values = new String[_rowSize];
+        for (int i = 0; i < columns.size(); i++) {
+            Column col = columns.get(i);
+            String val = col.getFrom(rows);
+            values[i] = val;
+        }
+        return this.add(values);
     }
 
     /** Read the contents of the file NAME.db, and return as a Table.
@@ -205,7 +244,7 @@ class Table {
      *  ArrayList<Integer>, or ArrayList<Object>).  This leads to annoying
      *  compiler warnings.  The trick of defining a new type avoids this
      *  issue. */
-    private static class ValueList extends ArrayList<String> {
+    public static class ValueList extends ArrayList<String> {
     }
 
     /** My column titles. */
