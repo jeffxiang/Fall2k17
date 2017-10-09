@@ -24,6 +24,20 @@ public class UnitTest {
     }
 
     @Test
+    public void testsize() {
+        String[] testlist = {"a", "b", "c"};
+        Table testtable = new Table(testlist);
+        Table testtable2 = new Table(testlist);
+        String[] row1 = {"1", "2", "3"};
+        String[] row2 = {"4", "5", "6"};
+        testtable.add(row1);
+        testtable.add(row2);
+        assertEquals(2, testtable.size());
+        assertEquals(0, testtable2.size());
+
+    }
+
+    @Test
     public void testgettitle() {
         String[] testlist = {"a", "b", "c"};
         Table testtable = new Table(testlist);
@@ -97,5 +111,81 @@ public class UnitTest {
 
         String[] duprow = {"1", "c"};
         assertEquals(false, testtable3.add(duprow));
+    }
+
+    @Test
+    public void testreadtable() {
+        String filename = "/Users/Jeff/repo/proj1/db61b/enrolled";
+        Table table = Table.readTable(filename);
+        String getelement = table.get(0, 1);
+        assertEquals("21228", getelement);
+        assertEquals("SID", table.getTitle(0));
+    }
+
+    @Test
+    public void testwritetable() {
+        String[] testlist = {"a", "b", "c"};
+        Table testtable = new Table(testlist);
+        String[] row1 = {"1", "2", "3"};
+        String[] row2 = {"4", "5", "6"};
+        testtable.add(row1);
+        testtable.add(row2);
+        testtable.writeTable("testwrite");
+        Table resulttable = Table.readTable("/Users/Jeff/repo/proj1/db61b/testwrite");
+        assertEquals(testtable.getTitle(0), resulttable.getTitle(0));
+        assertEquals(testtable.get(0, 1), resulttable.get(0, 1));
+    }
+
+    @Test
+    public void testselect() {
+        String[] testlist = {"a", "b", "c"};
+        Table testtable = new Table(testlist);
+        String[] row1 = {"2", "2", "3"};
+        String[] row2 = {"4", "5", "5"};
+        String[] row3 = {"1", "2", "2"};
+        testtable.add(row1);
+        testtable.add(row2);
+        testtable.add(row3);
+
+        List<Condition> testconditions = new ArrayList<>();
+        Condition cond1 = new Condition(new Column("a", testtable), "<", new Column("b", testtable));
+        Condition cond2 = new Condition(new Column("b", testtable), "=", new Column("c", testtable));
+        testconditions.add(cond1);
+        testconditions.add(cond2);
+
+        List<String> columnnames = new ArrayList<>();
+        columnnames.add("b");
+        columnnames.add("a");
+        Table resulttable = testtable.select(columnnames, testconditions);
+
+        assertEquals(2, resulttable.size());
+        assertEquals(2, resulttable.columns());
+        assertEquals("5", resulttable.get(0,0));
+        assertEquals("2", resulttable.get(1, 0));
+        assertEquals("1", resulttable.get(1, 1));
+    }
+
+    @Test
+    public void testselect2() {
+        Table students = Table.readTable("/Users/Jeff/repo/proj1/testing/students");
+        Table enrolled = Table.readTable("/Users/Jeff/repo/proj1/testing/enrolled");
+
+        List<String> columnnames = new ArrayList<>();
+        columnnames.add("Firstname");
+        columnnames.add("Lastname");
+        columnnames.add("Grade");
+
+        Column col = new Column("CCN", students, enrolled);
+        Condition cond = new Condition(col, "=", "21001");
+        List<Condition> testconditions = new ArrayList<>();
+        testconditions.add(cond);
+
+        Table joined = students.select(enrolled, columnnames, testconditions);
+
+        assertEquals(3, joined.columns());
+        assertEquals(4, joined.size());
+        assertEquals("Jason", joined.get(0, 0));
+        assertEquals("Knowles", joined.get(0, 1));
+        assertEquals("B", joined.get(3, 2));
     }
 }

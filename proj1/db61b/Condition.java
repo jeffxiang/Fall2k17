@@ -17,7 +17,9 @@ class Condition {
      *  are column designators. and RELATION is one of the
      *  strings "<", ">", "<=", ">=", "=", or "!=". */
     Condition(Column col1, String relation, Column col2) {
-        // YOUR CODE HERE
+        _col1 = col1;
+        _col2 = col2;
+        _relation = relation;
     }
 
     /** A Condition representing COL1 RELATION 'VAL2', where COL1 is
@@ -34,7 +36,56 @@ class Condition {
      *  from which my columns are selected, returns the result of
      *  performing the test I denote. */
     boolean test(Integer... rows) {
-        // REPLACE WITH SOLUTION
+        Table table1 = _col1.getTable();
+        int col1tblindex = _col1.gettableIndex();
+        String val1 = table1.get(rows[col1tblindex], table1.findColumn(_col1.getName()));
+        int val1int = Integer.parseInt(val1);
+        int val2int;
+        if (_col2 == null) {
+            val2int = Integer.parseInt(_val2);
+        }
+        else {
+            Table table2 = _col2.getTable();
+            int col2tblindex = _col2.gettableIndex();
+            String val2 = table2.get(rows[col2tblindex], table2.findColumn(_col2.getName()));
+            val2int = Integer.parseInt(val2);
+        }
+        if (this._relation.equals("<")) {
+            if (val1int < val2int) {
+                return true;
+            }
+        }
+        if (this._relation.equals(">")) {
+            if (val1int > val2int) {
+                return true;
+            }
+        }
+        if (this._relation.equals("<=")) {
+            if (val1int <= val2int) {
+                return true;
+            }
+        }
+        if (this._relation.equals(">=")) {
+            if (val1int >= val2int) {
+                return true;
+            }
+        }
+        if (this._relation.equals("=")) {
+            if (val1int == val2int) {
+                return true;
+            }
+            if (val1.equals(_val2)) {
+                return true;
+            }
+        }
+        if (this._relation.equals("!=")) {
+            if (val1int != val2int) {
+                return true;
+            }
+            if (!val1.equals(_val2)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -53,5 +104,6 @@ class Condition {
     private Column _col1, _col2;
     /** Second operand, if literal (otherwise null). */
     private String _val2;
-    // ADD ADDITIONAL FIELDS HERE
+
+    private String _relation;
 }

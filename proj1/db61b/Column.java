@@ -32,6 +32,14 @@ class Column {
         return _name;
     }
 
+    /** Return table containing this column. */
+    Table getTable() { return _table;}
+
+    /** Return table index containing this column */
+    int gettableIndex() {
+        return _tableIndex;
+    }
+
     /** Assuming that for each k, ROWS[k] is the index of a row from my
      *  kth table, return the value of my column from the appropriate
      *  row.  It is assumed that all columns with the same name have

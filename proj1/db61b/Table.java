@@ -27,7 +27,6 @@ class Table {
         if (columnTitles.length == 0) {
             throw error("table must have at least one column");
         }
-        _size = 0;
         _rowSize = columnTitles.length;
 
         for (int i = columnTitles.length - 1; i >= 1; i -= 1) {
@@ -39,9 +38,9 @@ class Table {
             }
         }
 
-        // FIXME
         _titles = columnTitles;
         _columns = new ValueList[_rowSize];
+
     }
 
     /** A new Table whose columns are give by COLUMNTITLES. */
@@ -75,6 +74,9 @@ class Table {
 
     /** Return the number of rows in this table. */
     public int size() {
+        if (this._columns[0] == null) {
+            return 0;
+        }
         return this._columns[0].size();
     }
 
@@ -149,7 +151,13 @@ class Table {
                 throw error("missing header in DB file");
             }
             String[] columnNames = header.split(",");
-            // FILL IN
+            table = new Table(columnNames);
+            String line = input.readLine();
+            while (line != null) {
+                String[] values = line.split(",");
+                table.add(values);
+                line = input.readLine();
+            }
         } catch (FileNotFoundException e) {
             throw error("could not find %s.db", name);
         } catch (IOException e) {
@@ -175,7 +183,22 @@ class Table {
             String sep;
             sep = "";
             output = new PrintStream(name + ".db");
-            // FILL THIS IN
+            String[] titles = this._titles;
+            for (int i = 0; i < this._rowSize; i++) {
+                String title = titles[i];
+                output.append(title);
+                output.append(",");
+            }
+            output.println(sep);
+            for (int row = 0; row < this.size(); row++) {
+                for (int col = 0; col < this._rowSize; col++) {
+                    String value = this.get(row, col);
+                    output.append(value);
+                    output.append(",");
+                }
+                output.println(sep);
+            }
+
         } catch (IOException e) {
             throw error("trouble writing to %s.db", name);
         } finally {
@@ -188,14 +211,36 @@ class Table {
     /** Print my contents on the standard output, separated by spaces
      *  and indented by two spaces. */
     void print() {
-        // FILL IN
+        for (int row = 0; row < this.size(); row++) {
+            System.out.print("  ");
+            for (int col = 0; col < this._rowSize; col++) {
+                String value = this.get(row, col);
+                System.out.print(value + " ");
+            }
+            System.out.println("");
+        }
     }
 
     /** Return a new Table whose columns are COLUMNNAMES, selected from
      *  rows of this table that satisfy CONDITIONS. */
     Table select(List<String> columnNames, List<Condition> conditions) {
         Table result = new Table(columnNames);
-        // FILL IN
+        for (int row = 0; row < this.size(); row++) {
+            String[] rowvals = new String[columnNames.size()];
+            boolean test = Condition.test(conditions, row, row);
+            if (test) {
+                for (String desiredcolumn: columnNames) {
+                    for (int col = 0; col < this._rowSize; col++) {
+                        String columntitle = this.getTitle(col);
+                        if (columntitle.equals(desiredcolumn)) {
+                            int desiredcolindex = columnNames.indexOf(desiredcolumn);
+                            rowvals[desiredcolindex] = this.get(row, col);
+                        }
+                    }
+                }
+                result.add(rowvals);
+            }
+        }
         return result;
     }
 
@@ -205,7 +250,52 @@ class Table {
     Table select(Table table2, List<String> columnNames,
                  List<Condition> conditions) {
         Table result = new Table(columnNames);
-        // FILL IN
+        String[] tbl2names = table2._titles;
+        List<String> commoncols = new ArrayList<>();
+        for (int i = 0; i < this._titles.length; i++) {
+            for (int j = 0; j < tbl2names.length; j++) {
+                if (this._titles[i].equals(tbl2names[j])) {
+                    commoncols.add(this._titles[i]);
+                }
+            }
+        }
+        for (int thisrow = 0; thisrow < this.size(); thisrow++) {
+            for (int tbl2row = 0; tbl2row < table2.size(); tbl2row++) {
+                String[] rowvals = new String[columnNames.size()];
+                int commoncounter = 0;
+                for (int commoncolindex = 0; commoncolindex < commoncols.size(); commoncolindex++) {
+                    String commoncol = commoncols.get(commoncolindex);
+                    int thistblcommoncolindex = this.findColumn(commoncol);
+                    int tbl2commoncolindex = table2.findColumn(commoncol);
+                    String thistblval = this.get(thisrow, thistblcommoncolindex);
+                    String tbl2val = table2.get(tbl2row, tbl2commoncolindex);
+                    if (thistblval.equals(tbl2val)) {
+                        commoncounter++;
+                    }
+                }
+                if (commoncounter == commoncols.size()) {
+                    boolean test = Condition.test(conditions, thisrow, tbl2row);
+                    if (test) {
+                        for (String desiredcolumn: columnNames) {
+                            int desiredcolindex = columnNames.indexOf(desiredcolumn);
+                            for (int thiscol = 0; thiscol < this._rowSize; thiscol++) {
+                                String thiscoltitle = this.getTitle(thiscol);
+                                if (thiscoltitle.equals(desiredcolumn)) {
+                                    rowvals[desiredcolindex] = this.get(thisrow, thiscol);
+                                }
+                            }
+                            for (int tbl2col = 0; tbl2col < table2._rowSize; tbl2col++) {
+                                String tbl2coltitle = table2.getTitle(tbl2col);
+                                if (tbl2coltitle.equals(desiredcolumn)) {
+                                    rowvals[desiredcolindex] = table2.get(tbl2row, tbl2col);
+                                }
+                            }
+                        }
+                        result.add(rowvals);
+                    }
+                }
+            }
+        }
         return result;
     }
 
@@ -266,8 +356,9 @@ class Table {
      *  _columns) rather than just one. */
     private final ArrayList<Integer> _index = new ArrayList<>();
 
-    /** My number of rows (redundant, but convenient). */
-    private int _size;
     /** My number of columns (redundant, but convenient). */
     private final int _rowSize;
+
+    /** My name */
+    private String _name;
 }
