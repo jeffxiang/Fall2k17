@@ -68,10 +68,63 @@ public class UnitTest {
         String[] row3 = {"7", "8", "9"};
         testtable.add(row1);
         testtable.add(row2);
+        boolean testnewrow = testtable.add(row3);
+
         String getelement = testtable.get(1, 2);
         assertEquals("6", getelement);
         assertEquals(false, testtable.add(duprow));
-        assertEquals(true, testtable.add(row3));
+        assertEquals(true, testnewrow);
+    }
+
+    @Test
+    public void testaddindex() {
+        String[] testcols = {"Name", "Age"};
+        Table testtable = new Table(testcols);
+        String[] row1 = {"Bob", "20"};
+        String[] row2 = {"Susan", "19"};
+        String[] row3 = {"Jane", "32"};
+        String[] row4 = {"Amy", "18"};
+        testtable.add(row1);
+        testtable.add(row2);
+        testtable.add(row3);
+        testtable.add(row4);
+
+        ArrayList<Integer> testtableindex = testtable.get_index();
+        ArrayList<Integer> expectedindex = new ArrayList<>();
+        expectedindex.add(3);
+        expectedindex.add(0);
+        expectedindex.add(2);
+        expectedindex.add(1);
+        assertEquals(expectedindex, testtableindex);
+
+        String[] row5 = {"Henry", "21"};
+        testtable.add(row5);
+        ArrayList<Integer> testtableindex2 = testtable.get_index();
+        expectedindex.add(2, 4);
+        assertEquals(expectedindex, testtableindex2);
+
+        String[] testcols1 = {"a", "b", "c"};
+        Table testtable1 = new Table(testcols1);
+        String[] row6 = {"1", "1", "3"};
+        String[] row7 = {"1", "2", "3"};
+        String[] row8 = {"2", "3", "1"};
+        String[] row9 = {"3", "1", "0"};
+        String[] row10 = {"2", "3", "2"};
+        testtable1.add(row6);
+        testtable1.add(row7);
+        testtable1.add(row8);
+        testtable1.add(row9);
+        testtable1.add(row10);
+
+        ArrayList<Integer> testtable1index = testtable1.get_index();
+        ArrayList<Integer> expectedindex1 = new ArrayList<>();
+        expectedindex1.add(0);
+        expectedindex1.add(1);
+        expectedindex1.add(2);
+        expectedindex1.add(4);
+        expectedindex1.add(3);
+
+        assertEquals(expectedindex1, testtable1index);
     }
 
     @Test
@@ -115,7 +168,7 @@ public class UnitTest {
 
     @Test
     public void testreadtable() {
-        String filename = "/Users/Jeff/repo/proj1/db61b/enrolled";
+        String filename = "enrolled";
         Table table = Table.readTable(filename);
         String getelement = table.get(0, 1);
         assertEquals("21228", getelement);
@@ -131,7 +184,7 @@ public class UnitTest {
         testtable.add(row1);
         testtable.add(row2);
         testtable.writeTable("testwrite");
-        Table resulttable = Table.readTable("/Users/Jeff/repo/proj1/db61b/testwrite");
+        Table resulttable = Table.readTable("testwrite");
         assertEquals(testtable.getTitle(0), resulttable.getTitle(0));
         assertEquals(testtable.get(0, 1), resulttable.get(0, 1));
     }
@@ -167,8 +220,8 @@ public class UnitTest {
 
     @Test
     public void testselect2() {
-        Table students = Table.readTable("/Users/Jeff/repo/proj1/testing/students");
-        Table enrolled = Table.readTable("/Users/Jeff/repo/proj1/testing/enrolled");
+        Table students = Table.readTable("students");
+        Table enrolled = Table.readTable("enrolled");
 
         List<String> columnnames = new ArrayList<>();
         columnnames.add("Firstname");
@@ -187,5 +240,21 @@ public class UnitTest {
         assertEquals("Jason", joined.get(0, 0));
         assertEquals("Knowles", joined.get(0, 1));
         assertEquals("B", joined.get(3, 2));
+    }
+
+    @Test
+    public void testput() {
+        Table students = Table.readTable("students");
+        Table enrolled = Table.readTable("enrolled");
+
+        Database testdatabase = new Database();
+        testdatabase.put("students", students);
+        testdatabase.put("enrolled", enrolled);
+
+        Table result1 = testdatabase.get("students");
+        Table result2 = testdatabase.get("enrolled");
+
+        assertEquals("101", result1.get(0,0));
+        assertEquals("B", result2.get(0, 2));
     }
 }

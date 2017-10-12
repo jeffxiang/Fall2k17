@@ -39,50 +39,43 @@ class Condition {
         Table table1 = _col1.getTable();
         int col1tblindex = _col1.gettableIndex();
         String val1 = table1.get(rows[col1tblindex], table1.findColumn(_col1.getName()));
-        int val1int = Integer.parseInt(val1);
-        int val2int;
+        String val2 = null;
         if (_col2 == null) {
-            val2int = Integer.parseInt(_val2);
+            val2 = _val2;
         }
-        else {
+        else if (_col2 != null) {
             Table table2 = _col2.getTable();
             int col2tblindex = _col2.gettableIndex();
-            String val2 = table2.get(rows[col2tblindex], table2.findColumn(_col2.getName()));
-            val2int = Integer.parseInt(val2);
+            val2 = table2.get(rows[col2tblindex], table2.findColumn(_col2.getName()));
         }
+
         if (this._relation.equals("<")) {
-            if (val1int < val2int) {
+            if (val1.compareTo(val2) < 0) {
                 return true;
             }
         }
         if (this._relation.equals(">")) {
-            if (val1int > val2int) {
+            if (val1.compareTo(val2) > 0) {
                 return true;
             }
         }
         if (this._relation.equals("<=")) {
-            if (val1int <= val2int) {
+            if (val1.compareTo(val2) <= 0) {
                 return true;
             }
         }
         if (this._relation.equals(">=")) {
-            if (val1int >= val2int) {
+            if (val1.compareTo(val2) >= 0) {
                 return true;
             }
         }
         if (this._relation.equals("=")) {
-            if (val1int == val2int) {
-                return true;
-            }
-            if (val1.equals(_val2)) {
+            if (val1.compareTo(val2) == 0) {
                 return true;
             }
         }
         if (this._relation.equals("!=")) {
-            if (val1int != val2int) {
-                return true;
-            }
-            if (!val1.equals(_val2)) {
+            if (val1.compareTo(val2) != 0) {
                 return true;
             }
         }
@@ -91,9 +84,11 @@ class Condition {
 
     /** Return true iff ROWS satisfies all CONDITIONS. */
     static boolean test(List<Condition> conditions, Integer... rows) {
-        for (Condition cond : conditions) {
-            if (!cond.test(rows)) {
-                return false;
+        if (conditions != null) {
+            for (Condition cond : conditions) {
+                if (!cond.test(rows)) {
+                    return false;
+                }
             }
         }
         return true;

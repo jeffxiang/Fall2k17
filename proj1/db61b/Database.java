@@ -7,20 +7,26 @@
 // solutions.
 package db61b;
 
-// FILL IN (WITH IMPORTS)?
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.*;
 
 /** A collection of Tables, indexed by name.
  *  @author */
 class Database {
     /** An empty database. */
     public Database() {
-        // FILL IN
+        _tables = new HashMap<>();
     }
 
     /** Return the Table whose name is NAME stored in this database, or null
      *  if there is no such table. */
     public Table get(String name) {
-        return null;             // REPLACE WITH SOLUTION
+        return this._tables.get(name);
     }
 
     /** Set or replace the table named NAME in THIS to TABLE.  TABLE and
@@ -29,8 +35,23 @@ class Database {
         if (name == null || table == null) {
             throw new IllegalArgumentException("null argument");
         }
-        // FILL IN
+        String firstchar = Character.toString(name.charAt(0));
+        try {
+            Integer.parseInt(firstchar);
+        }
+        catch (NumberFormatException excp) {
+            //* Not an integer, valid name */
+            this._tables.put(name, table);
+            return;
+        }
+        //* First character is an integer, invalid name */
+        throw Utils.error("invalid table name");
     }
 
-    // FILL IN?
+    //* Returns my list of tables */
+    public HashMap<String, Table> gettables() {
+        return this._tables;
+    }
+
+    private HashMap<String, Table> _tables;
 }

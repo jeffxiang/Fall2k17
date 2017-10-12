@@ -9,6 +9,8 @@
 package db61b;
 
 import java.io.PrintStream;
+import java.util.regex.Pattern;
+import java.util.List;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -166,7 +168,7 @@ class CommandInterpreter {
         _input.next("table");
         String name = name();
         Table table = tableDefinition();
-        // FILL IN CODE TO EXECUTE THE STATEMENT
+        _database.put(name, table);
         _input.next(";");
     }
 
@@ -190,21 +192,37 @@ class CommandInterpreter {
         String[] values = new String[cols];
 
         while (true) {
-            int k;
             _input.next("(");
-            // FILL THIS IN
-            _input.next(")");
-            table.add(values);
-            if (!_input.nextIf(",")) {
-                break;
+            int k = 0;
+            while (true) {
+                String literal = literal();
+                if (k >= cols) {
+                    throw error("too many values for columns");
+                }
+                values[k] = literal;
+                if (_input.nextIf(")")) {
+                    break;
+                }
+                _input.next(",");
+                k++;
             }
+            table.add(values);
+            if (_input.nextIf(",")) {
+                continue;
+            }
+            break;
         }
         _input.next(";");
     }
 
     /** Parse and execute a load statement from the token stream. */
     void loadStatement() {
-        // FILL THIS IN
+        _input.next("load");
+        String name = name();
+        _input.next(";");
+        Table table = Table.readTable(name);
+        _database.put(name, table);
+        System.out.println("Loaded " + name + ".db");
     }
 
     /** Parse and execute a store statement from the token stream. */
@@ -212,14 +230,19 @@ class CommandInterpreter {
         _input.next("store");
         String name = _input.peek();
         Table table = tableName();
-        // FILL THIS IN
+        table.writeTable(name);
         System.out.printf("Stored %s.db%n", name);
         _input.next(";");
     }
 
     /** Parse and execute a print statement from the token stream. */
     void printStatement() {
-        // FILL THIS IN
+        _input.next("print");
+        String name = name();
+        Table result = _database.get(name);
+        _input.next(";");
+        System.out.println("Contents of " + name + ":");
+        result.print();
     }
 
     /** Parse and execute a select statement from the token stream. */
@@ -235,20 +258,124 @@ class CommandInterpreter {
     Table tableDefinition() {
         Table table;
         if (_input.nextIf("(")) {
-            // REPLACE WITH SOLUTION
-            table = null;
-        } else {
-            // REPLACE WITH SOLUTION
-            table = null;
+            List<String> columnnames = new ArrayList<>();
+            String columnname = columnName();
+            columnnames.add(columnname);
+            while (_input.nextIf(",")) {
+                columnname = columnName();
+                if (columnnames.contains(columnname)) {
+                    throw error("there cannot be duplicate column names");
+                }
+                columnnames.add(columnname);
+
+            }
+            if (_input.nextIf(")")) {
+                String[] columnTitles = new String[columnnames.size()];
+                columnTitles = columnnames.toArray(columnTitles);
+                return new Table(columnTitles);
+            }
         }
+        _input.next("as");
+        table = selectClause();
         return table;
     }
 
     /** Parse and execute a select clause from the token stream, returning the
      *  resulting table. */
     Table selectClause() {
-        return null;         // REPLACE WITH SOLUTION
-
+        Table result = null;
+        _input.next("select");
+        List<String> colnames = new ArrayList<>();
+        List<String> tablenames = new ArrayList<>();
+        List<Table> tables = new ArrayList<>();
+        while (true) {
+            String colname = name();
+            colnames.add(colname);
+            if (_input.nextIf("from")) {
+                break;
+            }
+            _input.next(",");
+        }
+        while (true) {
+            String tablename = name();
+            tablenames.add(tablename);
+            tables.add(_database.get(tablename));
+            if (_input.nextIf("where")) {
+                break;
+            }
+            else if (_input.nextIs(";")) {
+                Table table1 = tables.get(0);
+                if (tablenames.size() == 2) {
+                    Table table2 = tables.get(1);
+                    result = table1.select(table2, colnames, null);
+                    return result;
+                }
+                result = table1.select(colnames, null);
+                return result;
+            }
+            _input.next(",");
+        }
+        int numtables = tables.size();
+        List<Condition> conditions = new ArrayList<>();
+        while (true) {
+            if (_input.nextIs(";")) {
+                break;
+            }
+            String col1name = name();
+            String relation = relation();
+            Condition cond;
+            Column col1;
+            if (_input.nextIs(Tokenizer.IDENTIFIER)) {
+                Column col2;
+                String col2name = name();
+                if (numtables == 2) {
+                    col1 = new Column(col1name, tables.get(0), tables.get(1));
+                    col2 = new Column(col2name, tables.get(0), tables.get(1));
+                    cond = new Condition(col1, relation, col2);
+                    conditions.add(cond);
+                    if (_input.nextIs("and")) {
+                        _input.next("and");
+                    }
+                    continue;
+                }
+                col1 = new Column(col1name, tables.get(0));
+                col2 = new Column(col2name, tables.get(0));
+                cond = new Condition(col1, relation, col2);
+                conditions.add(cond);
+                if (_input.nextIs("and")) {
+                    _input.next("and");
+                }
+                continue;
+            }
+            if (_input.nextIs(Tokenizer.LITERAL)) {
+                String val2 = literal();
+                if (numtables == 2) {
+                    col1 = new Column(col1name, tables.get(0), tables.get(1));
+                    cond = new Condition(col1, relation, val2);
+                    conditions.add(cond);
+                    if (_input.nextIs("and")) {
+                        _input.next("and");
+                    }
+                    continue;
+                }
+                col1 = new Column(col1name, tables.get(0));
+                cond = new Condition(col1, relation, val2);
+                conditions.add(cond);
+                if (_input.nextIs("and")) {
+                    _input.next("and");
+                }
+                continue;
+            }
+        }
+        if (numtables == 2) {
+            Table table1 = tables.get(0);
+            Table table2 = tables.get(1);
+            result = table1.select(table2, colnames, conditions);
+            return result;
+        }
+        Table table1 = tables.get(0);
+        result = table1.select(colnames, conditions);
+        return result;
     }
 
     /** Parse and return a valid name (identifier) from the token stream. */
@@ -281,6 +408,10 @@ class CommandInterpreter {
         return lit.substring(1, lit.length() - 1).trim();
     }
 
+    String relation() {
+        String rel = _input.next(Tokenizer.RELATION);
+        return rel;
+    }
     /** Parse and return a list of Conditions that apply to TABLES from the
      *  token stream.  This denotes the conjunction (`and') of zero
      *  or more Conditions. */

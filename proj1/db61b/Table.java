@@ -53,6 +53,11 @@ class Table {
         return this._rowSize;
     }
 
+    /** Return my titles */
+    public String[] getTitles() {
+        return this._titles;
+    }
+
     /** Return the title of the Kth column.  Requires 0 <= K < columns(). */
     public String getTitle(int k) {
         if (k >= this.columns()) {
@@ -119,6 +124,32 @@ class Table {
             }
             this._columns[i].add(values[i]);
         }
+        if (this._columns[0].size() == 1) {
+            this._index.add(0);
+        }
+        else {
+            int indexof_index = 0;
+            int col = 0;
+            int indexofjustadded = this._columns[col].size()-1;
+            while (indexof_index < this._index.size()) {
+                indexofjustadded = this._columns[col].size()-1;
+                String valofjustadded = this._columns[col].get(indexofjustadded);
+                String valintable = this._columns[col].get(this._index.get(indexof_index));
+                int comparison = valofjustadded.compareTo(valintable);
+                if (comparison < 0) {
+                    this._index.add(indexof_index, indexofjustadded);
+                    return true;
+                }
+                else if (comparison > 0) {
+                    indexof_index++;
+                    col = 0;
+                }
+                else {
+                    col++;
+                }
+            }
+            this._index.add(indexof_index, indexofjustadded);
+        }
         return true;
     }
 
@@ -145,7 +176,7 @@ class Table {
         input = null;
         table = null;
         try {
-            input = new BufferedReader(new FileReader(name + ".db"));
+            input = new BufferedReader(new FileReader("/Users/Jeff/repo/proj1/testing/" + name + ".db"));
             String header = input.readLine();
             if (header == null) {
                 throw error("missing header in DB file");
@@ -182,7 +213,7 @@ class Table {
         try {
             String sep;
             sep = "";
-            output = new PrintStream(name + ".db");
+            output = new PrintStream("/Users/Jeff/repo/proj1/testing/" + name + ".db");
             String[] titles = this._titles;
             for (int i = 0; i < this._rowSize; i++) {
                 String title = titles[i];
@@ -214,7 +245,7 @@ class Table {
         for (int row = 0; row < this.size(); row++) {
             System.out.print("  ");
             for (int col = 0; col < this._rowSize; col++) {
-                String value = this.get(row, col);
+                String value = this.get(this._index.get(row), col);
                 System.out.print(value + " ");
             }
             System.out.println("");
@@ -250,7 +281,7 @@ class Table {
     Table select(Table table2, List<String> columnNames,
                  List<Condition> conditions) {
         Table result = new Table(columnNames);
-        String[] tbl2names = table2._titles;
+        String[] tbl2names = table2.getTitles();
         List<String> commoncols = new ArrayList<>();
         for (int i = 0; i < this._titles.length; i++) {
             for (int j = 0; j < tbl2names.length; j++) {
@@ -297,6 +328,10 @@ class Table {
             }
         }
         return result;
+    }
+
+    public ArrayList<Integer> get_index() {
+        return this._index;
     }
 
     /** Return <0, 0, or >0 depending on whether the row formed from
