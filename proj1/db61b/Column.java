@@ -9,7 +9,7 @@ import static db61b.Utils.*;
  *  named c.  The resulting Column object can extract (method getFrom)
  *  from a sequence of n rows, one for each table, the value of
  *  of the column named c.
- *  @author
+ *  @author Jeff Xiang
 */
 class Column {
     /** Selects column named NAME from a row of one of the given TABLES. */
@@ -33,9 +33,11 @@ class Column {
     }
 
     /** Return table containing this column. */
-    Table getTable() { return _table;}
+    Table getTable() {
+        return _table;
+    }
 
-    /** Return table index containing this column */
+    /** Return table index containing this column. */
     int gettableIndex() {
         return _tableIndex;
     }

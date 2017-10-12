@@ -1,10 +1,3 @@
-// This is a SUGGESTED skeleton for a class that represents a single
-// Table.  You can throw this away if you want, but it is a good
-// idea to try to understand it first.  Our solution changes or adds
-// about 100 lines in this skeleton.
-
-// Comments that start with "//" are intended to be removed from your
-// solutions.
 package db61b;
 
 import java.io.BufferedReader;
@@ -18,7 +11,7 @@ import java.util.List;
 import static db61b.Utils.*;
 
 /** A single table in a database.
- *  @author P. N. Hilfinger
+ *  @author Jeff Xiang
  */
 class Table {
     /** A new Table whose columns are given by COLUMNTITLES, which may
@@ -53,7 +46,7 @@ class Table {
         return this._rowSize;
     }
 
-    /** Return my titles */
+    /** Return my titles. */
     public String[] getTitles() {
         return this._titles;
     }
@@ -107,8 +100,9 @@ class Table {
                     for (int col = 0; col < this._columns.length; col++) {
                         if (!values[col].equals(this._columns[col].get(row))) {
                             break;
-                        }
-                        else if (col == this._columns.length-1 && values[col].equals(this._columns[col].get(row))) {
+                        } else if (col == this._columns.length - 1
+                                && values[col].equals
+                                (this._columns[col].get(row))) {
                             existequalrow = true;
                         }
                     }
@@ -126,29 +120,28 @@ class Table {
         }
         if (this._columns[0].size() == 1) {
             this._index.add(0);
-        }
-        else {
-            int indexof_index = 0;
+        } else {
+            int indexofindex = 0;
             int col = 0;
-            int indexofjustadded = this._columns[col].size()-1;
-            while (indexof_index < this._index.size()) {
-                indexofjustadded = this._columns[col].size()-1;
-                String valofjustadded = this._columns[col].get(indexofjustadded);
-                String valintable = this._columns[col].get(this._index.get(indexof_index));
+            int indexofjustadded = this._columns[col].size() - 1;
+            while (indexofindex < this._index.size()) {
+                indexofjustadded = this._columns[col].size() - 1;
+                String valofjustadded = this._columns[col]
+                        .get(indexofjustadded);
+                String valintable = this._columns[col]
+                        .get(this._index.get(indexofindex));
                 int comparison = valofjustadded.compareTo(valintable);
                 if (comparison < 0) {
-                    this._index.add(indexof_index, indexofjustadded);
+                    this._index.add(indexofindex, indexofjustadded);
                     return true;
-                }
-                else if (comparison > 0) {
-                    indexof_index++;
+                } else if (comparison > 0) {
+                    indexofindex++;
                     col = 0;
-                }
-                else {
+                } else {
                     col++;
                 }
             }
-            this._index.add(indexof_index, indexofjustadded);
+            this._index.add(indexofindex, indexofjustadded);
         }
         return true;
     }
@@ -176,7 +169,8 @@ class Table {
         input = null;
         table = null;
         try {
-            input = new BufferedReader(new FileReader("/Users/Jeff/repo/proj1/testing/" + name + ".db"));
+            input = new BufferedReader(new FileReader(
+                    "/Users/Jeff/repo/proj1/testing/" + name + ".db"));
             String header = input.readLine();
             if (header == null) {
                 throw error("missing header in DB file");
@@ -213,7 +207,8 @@ class Table {
         try {
             String sep;
             sep = "";
-            output = new PrintStream("/Users/Jeff/repo/proj1/testing/" + name + ".db");
+            output = new PrintStream(
+                    "/Users/Jeff/repo/proj1/testing/" + name + ".db");
             String[] titles = this._titles;
             for (int i = 0; i < this._rowSize; i++) {
                 String title = titles[i];
@@ -264,8 +259,8 @@ class Table {
                     for (int col = 0; col < this._rowSize; col++) {
                         String columntitle = this.getTitle(col);
                         if (columntitle.equals(desiredcolumn)) {
-                            int desiredcolindex = columnNames.indexOf(desiredcolumn);
-                            rowvals[desiredcolindex] = this.get(row, col);
+                            int descolind = columnNames.indexOf(desiredcolumn);
+                            rowvals[descolind] = this.get(row, col);
                         }
                     }
                 }
@@ -294,11 +289,13 @@ class Table {
             for (int tbl2row = 0; tbl2row < table2.size(); tbl2row++) {
                 String[] rowvals = new String[columnNames.size()];
                 int commoncounter = 0;
-                for (int commoncolindex = 0; commoncolindex < commoncols.size(); commoncolindex++) {
+                for (int commoncolindex = 0;
+                     commoncolindex < commoncols.size(); commoncolindex++) {
                     String commoncol = commoncols.get(commoncolindex);
                     int thistblcommoncolindex = this.findColumn(commoncol);
                     int tbl2commoncolindex = table2.findColumn(commoncol);
-                    String thistblval = this.get(thisrow, thistblcommoncolindex);
+                    String thistblval = this.get(thisrow,
+                            thistblcommoncolindex);
                     String tbl2val = table2.get(tbl2row, tbl2commoncolindex);
                     if (thistblval.equals(tbl2val)) {
                         commoncounter++;
@@ -308,17 +305,22 @@ class Table {
                     boolean test = Condition.test(conditions, thisrow, tbl2row);
                     if (test) {
                         for (String desiredcolumn: columnNames) {
-                            int desiredcolindex = columnNames.indexOf(desiredcolumn);
-                            for (int thiscol = 0; thiscol < this._rowSize; thiscol++) {
+                            int desiredcolindex =
+                                    columnNames.indexOf(desiredcolumn);
+                            for (int thiscol = 0;
+                                 thiscol < this._rowSize; thiscol++) {
                                 String thiscoltitle = this.getTitle(thiscol);
                                 if (thiscoltitle.equals(desiredcolumn)) {
-                                    rowvals[desiredcolindex] = this.get(thisrow, thiscol);
+                                    rowvals[desiredcolindex] =
+                                            this.get(thisrow, thiscol);
                                 }
                             }
-                            for (int tbl2col = 0; tbl2col < table2._rowSize; tbl2col++) {
+                            for (int tbl2col = 0;
+                                 tbl2col < table2._rowSize; tbl2col++) {
                                 String tbl2coltitle = table2.getTitle(tbl2col);
                                 if (tbl2coltitle.equals(desiredcolumn)) {
-                                    rowvals[desiredcolindex] = table2.get(tbl2row, tbl2col);
+                                    rowvals[desiredcolindex] =
+                                            table2.get(tbl2row, tbl2col);
                                 }
                             }
                         }
@@ -330,7 +332,8 @@ class Table {
         return result;
     }
 
-    public ArrayList<Integer> get_index() {
+    /** Returns my index. */
+    public ArrayList<Integer> getIndex() {
         return this._index;
     }
 
@@ -347,17 +350,6 @@ class Table {
             }
         }
         return 0;
-    }
-
-    /** Return true if the columns COMMON1 from ROW1 and COMMON2 from
-     *  ROW2 all have identical values.  Assumes that COMMON1 and
-     *  COMMON2 have the same number of elements and the same names,
-     *  that the columns in COMMON1 apply to this table, those in
-     *  COMMON2 to another, and that ROW1 and ROW2 are indices, respectively,
-     *  into those tables. */
-    private static boolean equijoin(List<Column> common1, List<Column> common2,
-                                    int row1, int row2) {
-        return true; // REPLACE WITH SOLUTION
     }
 
     /** A class that is essentially ArrayList<String>.  For technical reasons,
@@ -393,7 +385,4 @@ class Table {
 
     /** My number of columns (redundant, but convenient). */
     private final int _rowSize;
-
-    /** My name */
-    private String _name;
 }

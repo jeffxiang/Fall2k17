@@ -1,16 +1,9 @@
-// This is a SUGGESTED skeleton for a class that describes a single
-// Condition (such as CCN = '99776').  You can throw this away if you
-// want,  but it is a good idea to try to understand it first.
-// Our solution changes or adds about 30 lines in this skeleton.
-
-// Comments that start with "//" are intended to be removed from your
-// solutions.
 package db61b;
 
 import java.util.List;
 
 /** Represents a single 'where' condition in a 'select' command.
- *  @author */
+ *  @author Jeff Xiang */
 class Condition {
 
     /** A Condition representing COL1 RELATION COL2, where COL1 and COL2
@@ -38,15 +31,16 @@ class Condition {
     boolean test(Integer... rows) {
         Table table1 = _col1.getTable();
         int col1tblindex = _col1.gettableIndex();
-        String val1 = table1.get(rows[col1tblindex], table1.findColumn(_col1.getName()));
+        String val1 = table1.get(rows[col1tblindex],
+                table1.findColumn(_col1.getName()));
         String val2 = null;
         if (_col2 == null) {
             val2 = _val2;
-        }
-        else if (_col2 != null) {
+        } else if (_col2 != null) {
             Table table2 = _col2.getTable();
             int col2tblindex = _col2.gettableIndex();
-            val2 = table2.get(rows[col2tblindex], table2.findColumn(_col2.getName()));
+            val2 = table2.get(rows[col2tblindex],
+                    table2.findColumn(_col2.getName()));
         }
 
         if (this._relation.equals("<")) {
@@ -100,5 +94,6 @@ class Condition {
     /** Second operand, if literal (otherwise null). */
     private String _val2;
 
+    /** My relation. */
     private String _relation;
 }

@@ -2,7 +2,8 @@ package db61b;
 
 import org.junit.Test;
 import ucb.junit.textui;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import static org.junit.Assert.*;
 
 /** The suite of all JUnit tests for the qirkat package.
@@ -45,8 +46,8 @@ public class UnitTest {
         try {
             testtable.getTitle(9999);
             fail();
-        }
-        catch (DBException db) {
+        } catch (DBException db) {
+            return;
         }
     }
 
@@ -89,7 +90,7 @@ public class UnitTest {
         testtable.add(row3);
         testtable.add(row4);
 
-        ArrayList<Integer> testtableindex = testtable.get_index();
+        ArrayList<Integer> testtableindex = testtable.getIndex();
         ArrayList<Integer> expectedindex = new ArrayList<>();
         expectedindex.add(3);
         expectedindex.add(0);
@@ -99,7 +100,7 @@ public class UnitTest {
 
         String[] row5 = {"Henry", "21"};
         testtable.add(row5);
-        ArrayList<Integer> testtableindex2 = testtable.get_index();
+        ArrayList<Integer> testtableindex2 = testtable.getIndex();
         expectedindex.add(2, 4);
         assertEquals(expectedindex, testtableindex2);
 
@@ -116,7 +117,7 @@ public class UnitTest {
         testtable1.add(row9);
         testtable1.add(row10);
 
-        ArrayList<Integer> testtable1index = testtable1.get_index();
+        ArrayList<Integer> testtable1index = testtable1.getIndex();
         ArrayList<Integer> expectedindex1 = new ArrayList<>();
         expectedindex1.add(0);
         expectedindex1.add(1);
@@ -158,7 +159,7 @@ public class UnitTest {
         columns.add(col2);
 
         testtable3.add(columns, 0, 2);
-        String getelement = testtable3.get(0,0);
+        String getelement = testtable3.get(0, 0);
         assertEquals("1", getelement);
         assertEquals("c", testtable3.get(0, 1));
 
@@ -201,8 +202,10 @@ public class UnitTest {
         testtable.add(row3);
 
         List<Condition> testconditions = new ArrayList<>();
-        Condition cond1 = new Condition(new Column("a", testtable), "<", new Column("b", testtable));
-        Condition cond2 = new Condition(new Column("b", testtable), "=", new Column("c", testtable));
+        Condition cond1 = new Condition(new Column("a", testtable),
+                "<", new Column("b", testtable));
+        Condition cond2 = new Condition(new Column("b", testtable),
+                "=", new Column("c", testtable));
         testconditions.add(cond1);
         testconditions.add(cond2);
 
@@ -213,7 +216,7 @@ public class UnitTest {
 
         assertEquals(2, resulttable.size());
         assertEquals(2, resulttable.columns());
-        assertEquals("5", resulttable.get(0,0));
+        assertEquals("5", resulttable.get(0, 0));
         assertEquals("2", resulttable.get(1, 0));
         assertEquals("1", resulttable.get(1, 1));
     }
@@ -254,7 +257,7 @@ public class UnitTest {
         Table result1 = testdatabase.get("students");
         Table result2 = testdatabase.get("enrolled");
 
-        assertEquals("101", result1.get(0,0));
+        assertEquals("101", result1.get(0, 0));
         assertEquals("B", result2.get(0, 2));
     }
 }

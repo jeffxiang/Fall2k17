@@ -1,26 +1,16 @@
-// This is a SUGGESTED skeleton for a class that parses and executes database
-// statements.  Be sure to read the STRATEGY section, and ask us if you have any
-// questions about it.  You can throw this away if you want, but it is a good
-// idea to try to understand it first.  Our solution adds or changes about 50
-// lines in this skeleton.
-
-// Comments that start with "//" are intended to be removed from your
-// solutions.
 package db61b;
 
 import java.io.PrintStream;
-import java.util.regex.Pattern;
 import java.util.List;
 
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import static db61b.Utils.*;
-import static db61b.Tokenizer.*;
 
 /** An object that reads and interprets a sequence of commands from an
  *  input source.
- *  @author */
+ *  @author Jeff Xiang */
 class CommandInterpreter {
 
     /* STRATEGY.
@@ -283,35 +273,25 @@ class CommandInterpreter {
     /** Parse and execute a select clause from the token stream, returning the
      *  resulting table. */
     Table selectClause() {
-        Table result = null;
         _input.next("select");
         List<String> colnames = new ArrayList<>();
-        List<String> tablenames = new ArrayList<>();
         List<Table> tables = new ArrayList<>();
         while (true) {
-            String colname = name();
-            colnames.add(colname);
+            colnames.add(name());
             if (_input.nextIf("from")) {
                 break;
             }
             _input.next(",");
         }
         while (true) {
-            String tablename = name();
-            tablenames.add(tablename);
-            tables.add(_database.get(tablename));
+            tables.add(_database.get(name()));
             if (_input.nextIf("where")) {
                 break;
-            }
-            else if (_input.nextIs(";")) {
-                Table table1 = tables.get(0);
-                if (tablenames.size() == 2) {
-                    Table table2 = tables.get(1);
-                    result = table1.select(table2, colnames, null);
-                    return result;
+            } else if (_input.nextIs(";")) {
+                if (tables.size() == 2) {
+                    return tables.get(0).select(tables.get(1), colnames, null);
                 }
-                result = table1.select(colnames, null);
-                return result;
+                return tables.get(0).select(colnames, null);
             }
             _input.next(",");
         }
@@ -321,61 +301,35 @@ class CommandInterpreter {
             if (_input.nextIs(";")) {
                 break;
             }
-            String col1name = name();
+            String c1n = name();
             String relation = relation();
-            Condition cond;
-            Column col1;
-            if (_input.nextIs(Tokenizer.IDENTIFIER)) {
-                Column col2;
-                String col2name = name();
-                if (numtables == 2) {
-                    col1 = new Column(col1name, tables.get(0), tables.get(1));
-                    col2 = new Column(col2name, tables.get(0), tables.get(1));
-                    cond = new Condition(col1, relation, col2);
-                    conditions.add(cond);
-                    if (_input.nextIs("and")) {
-                        _input.next("and");
-                    }
-                    continue;
+            if (numtables == 2) {
+                Column col1 = new Column(c1n, tables.get(0), tables.get(1));
+                if (_input.nextIs(Tokenizer.IDENTIFIER)) {
+                    String c2n = name();
+                    Column col2 = new Column(c2n, tables.get(0), tables.get(1));
+                    conditions.add(new Condition(col1, relation, col2));
+                } else if (_input.nextIs(Tokenizer.LITERAL)) {
+                    String val2 = literal();
+                    conditions.add(new Condition(col1, relation, val2));
                 }
-                col1 = new Column(col1name, tables.get(0));
-                col2 = new Column(col2name, tables.get(0));
-                cond = new Condition(col1, relation, col2);
-                conditions.add(cond);
-                if (_input.nextIs("and")) {
-                    _input.next("and");
+            } else if (numtables == 1) {
+                Column col1 = new Column(c1n, tables.get(0));
+                if (_input.nextIs(Tokenizer.IDENTIFIER)) {
+                    String c2n = name();
+                    Column col2 = new Column(c2n, tables.get(0));
+                    conditions.add(new Condition(col1, relation, col2));
+                } else if (_input.nextIs(Tokenizer.LITERAL)) {
+                    String val2 = literal();
+                    conditions.add(new Condition(col1, relation, val2));
                 }
-                continue;
             }
-            if (_input.nextIs(Tokenizer.LITERAL)) {
-                String val2 = literal();
-                if (numtables == 2) {
-                    col1 = new Column(col1name, tables.get(0), tables.get(1));
-                    cond = new Condition(col1, relation, val2);
-                    conditions.add(cond);
-                    if (_input.nextIs("and")) {
-                        _input.next("and");
-                    }
-                    continue;
-                }
-                col1 = new Column(col1name, tables.get(0));
-                cond = new Condition(col1, relation, val2);
-                conditions.add(cond);
-                if (_input.nextIs("and")) {
-                    _input.next("and");
-                }
-                continue;
-            }
+            _input.nextIf("and");
         }
         if (numtables == 2) {
-            Table table1 = tables.get(0);
-            Table table2 = tables.get(1);
-            result = table1.select(table2, colnames, conditions);
-            return result;
+            return tables.get(0).select(tables.get(1), colnames, conditions);
         }
-        Table table1 = tables.get(0);
-        result = table1.select(colnames, conditions);
-        return result;
+        return tables.get(0).select(colnames, conditions);
     }
 
     /** Parse and return a valid name (identifier) from the token stream. */
@@ -408,21 +362,10 @@ class CommandInterpreter {
         return lit.substring(1, lit.length() - 1).trim();
     }
 
+    /** Parse a relation and return the string it represents. */
     String relation() {
         String rel = _input.next(Tokenizer.RELATION);
         return rel;
-    }
-    /** Parse and return a list of Conditions that apply to TABLES from the
-     *  token stream.  This denotes the conjunction (`and') of zero
-     *  or more Conditions. */
-    ArrayList<Condition> conditionClause(Table... tables) {
-        return null;        // REPLACE WITH SOLUTION
-    }
-
-    /** Parse and return a Condition that applies to TABLES from the
-     *  token stream. */
-    Condition condition(Table... tables) {
-        return null;        // REPLACE WITH SOLUTION
     }
 
     /** Advance the input past the next semicolon. */
