@@ -17,5 +17,9 @@ create table enrolled2 as
      where Dept = 'EECS' and Num = '61A';
 /* Now print the names of the students in this list */
 select Firstname, Lastname from students, enrolled2;
+/* Insert values into blank.db */
+load blank;
+insert into blank values ('this is', 'a', 'test');
+insert into blank values ('this  is', 'a', 'test');
+print blank;
 quit;
-

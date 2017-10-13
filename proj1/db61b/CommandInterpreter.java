@@ -229,18 +229,26 @@ class CommandInterpreter {
     void printStatement() {
         _input.next("print");
         String name = name();
-        Table result = _database.get(name);
-        _input.next(";");
-        System.out.println("Contents of " + name + ":");
-        result.print();
+        try {
+            Table result = _database.get(name);
+            _input.next(";");
+            System.out.println("Contents of " + name + ":");
+            result.print();
+        } catch (NullPointerException excp) {
+            throw error("unknown table");
+        }
     }
 
     /** Parse and execute a select statement from the token stream. */
     void selectStatement() {
-        Table table = selectClause();
-        System.out.println("Search results:");
-        table.print();
-        _input.next(";");
+        try {
+            Table table = selectClause();
+            System.out.println("Search results:");
+            table.print();
+            _input.next(";");
+        } catch (NullPointerException excp) {
+            throw error("table or column not found");
+        }
     }
 
     /** Parse and execute a table definition, returning the specified
