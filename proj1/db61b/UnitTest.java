@@ -169,7 +169,7 @@ public class UnitTest {
 
     @Test
     public void testreadtable() {
-        String filename = "enrolled";
+        String filename = "testing/enrolled";
         Table table = Table.readTable(filename);
         String getelement = table.get(0, 1);
         assertEquals("21228", getelement);
@@ -223,8 +223,8 @@ public class UnitTest {
 
     @Test
     public void testselect2() {
-        Table students = Table.readTable("students");
-        Table enrolled = Table.readTable("enrolled");
+        Table students = Table.readTable("testing/students");
+        Table enrolled = Table.readTable("testing/enrolled");
 
         List<String> columnnames = new ArrayList<>();
         columnnames.add("Firstname");
@@ -247,8 +247,8 @@ public class UnitTest {
 
     @Test
     public void testput() {
-        Table students = Table.readTable("students");
-        Table enrolled = Table.readTable("enrolled");
+        Table students = Table.readTable("testing/students");
+        Table enrolled = Table.readTable("testing/enrolled");
 
         Database testdatabase = new Database();
         testdatabase.put("students", students);
