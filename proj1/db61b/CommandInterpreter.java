@@ -229,14 +229,12 @@ class CommandInterpreter {
     void printStatement() {
         _input.next("print");
         String name = name();
-        try {
-            _database.get(name);
-        } catch (NullPointerException excp) {
-            throw error("unknown table: " + name);
-        }
         Table result = _database.get(name);
+        if (result == null) {
+            throw error("Unknown table: " + name);
+        }
         _input.next(";");
-        System.out.println("Contents of " + name + ": ");
+        System.out.println("Contents of " + name + ":");
         result.print();
     }
 
