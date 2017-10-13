@@ -230,13 +230,14 @@ class CommandInterpreter {
         _input.next("print");
         String name = name();
         try {
-            Table result = _database.get(name);
-            _input.next(";");
-            System.out.println("Contents of " + name + ":");
-            result.print();
+            _database.get(name);
         } catch (NullPointerException excp) {
-            throw error("unknown table:" + name);
+            throw error("unknown table: " + name);
         }
+        Table result = _database.get(name);
+        _input.next(";");
+        System.out.println("Contents of " + name + ": ");
+        result.print();
     }
 
     /** Parse and execute a select statement from the token stream. */
