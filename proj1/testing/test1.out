@@ -22,3 +22,16 @@ DB61B System.  Version 2.0.
   this is a test
 > Error: unknown table: glorp
 > Loaded generic1.db
+> > > > > > > Contents of folks:
+  Ann 30 Detroit
+  Brian 10 Ann Arbor
+  George 60 Syracuse
+  Martin 80 Buffalo
+> Stored folks.db
+> > > Contents of folks:
+> > Loaded folks.db
+> Contents of folks:
+  Ann 30 Detroit
+  Brian 10 Ann Arbor
+  George 60 Syracuse
+  Martin 80 Buffalo

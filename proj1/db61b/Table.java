@@ -169,7 +169,7 @@ class Table {
         input = null;
         try {
             input = new BufferedReader(new FileReader(
-                    "../testing/" + name + ".db"));
+                    name + ".db"));
             String header = input.readLine();
             if (header == null) {
                 throw error("missing header in DB file");
@@ -207,7 +207,7 @@ class Table {
             String sep;
             sep = "";
             output = new PrintStream(
-                    "../testing/" + name + ".db");
+                    name + ".db");
             String[] titles = this._titles;
             for (int i = 0; i < this._rowSize; i++) {
                 String title = titles[i];
