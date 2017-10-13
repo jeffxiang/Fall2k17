@@ -22,5 +22,6 @@ load blank;
 insert into blank values ('this is', 'a', 'test');
 insert into blank values ('this  is', 'a', 'test');
 print blank;
-print glorp ;
+print glorp;
+load generic1;
 quit;

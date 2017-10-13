@@ -167,7 +167,6 @@ class Table {
         BufferedReader input;
         Table table;
         input = null;
-        table = null;
         try {
             input = new BufferedReader(new FileReader(
                     "../testing/" + name + ".db"));
