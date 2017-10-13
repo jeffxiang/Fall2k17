@@ -235,7 +235,7 @@ class CommandInterpreter {
             System.out.println("Contents of " + name + ":");
             result.print();
         } catch (NullPointerException excp) {
-            throw error("unknown table");
+            throw error("unknown table:" + name);
         }
     }
 
