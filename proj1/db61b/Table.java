@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
 
 import static db61b.Utils.*;
 
@@ -170,9 +169,8 @@ class Table {
         input = null;
         table = null;
         try {
-            File file = new File(
-                    "../testing/" + name + ".db");
-            input = new BufferedReader(new FileReader(file));
+            input = new BufferedReader(new FileReader(
+                    "../testing/" + name + ".db"));
             String header = input.readLine();
             if (header == null) {
                 throw error("missing header in DB file");
@@ -209,9 +207,8 @@ class Table {
         try {
             String sep;
             sep = "";
-            File file = new File(
+            output = new PrintStream(
                     "../testing/" + name + ".db");
-            output = new PrintStream(file);
             String[] titles = this._titles;
             for (int i = 0; i < this._rowSize; i++) {
                 String title = titles[i];
