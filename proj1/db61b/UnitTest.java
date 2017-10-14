@@ -184,8 +184,8 @@ public class UnitTest {
         String[] row2 = {"4", "5", "6"};
         testtable.add(row1);
         testtable.add(row2);
-        testtable.writeTable("testwrite");
-        Table resulttable = Table.readTable("testwrite");
+        testtable.writeTable("testing/testwrite");
+        Table resulttable = Table.readTable("testing/testwrite");
         assertEquals(testtable.getTitle(0), resulttable.getTitle(0));
         assertEquals(testtable.get(0, 1), resulttable.get(0, 1));
     }
