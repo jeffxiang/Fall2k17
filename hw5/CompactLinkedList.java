@@ -70,7 +70,14 @@ public class CompactLinkedList<T> extends AbstractSequentialList<T> {
 
         @Override
         public T next() {
-            return null; // REPLACE WITH SOLUTION
+            if (_next == -1) {
+                throw new IllegalStateException();
+            }
+            T val = _data[_next];
+            int temp = _next;
+            _next = _link[_next]^_prev;
+            _prev = temp;
+            return val;
         }
 
         @Override
@@ -85,7 +92,14 @@ public class CompactLinkedList<T> extends AbstractSequentialList<T> {
 
         @Override
         public T previous() {
-            return null; // REPLACE WITH SOLUTION
+            if (_prev == -1) {
+                throw new IllegalStateException();
+            }
+            T val = _data[_prev];
+            int temp = _prev;
+            _prev = _link[_prev]^_next;
+            _next = temp;
+            return val;
         }
 
         @Override
@@ -106,7 +120,25 @@ public class CompactLinkedList<T> extends AbstractSequentialList<T> {
              * require some other way of finding indices that are
              * no longer in use (for example, that were being used, but were
              * then removed).  For this exercise, you needn't bother. */
-            // FILL IN
+            if (_size == _data.length) {
+                throw new IllegalStateException();
+            }
+            _data[_size] = obj;
+            _link[_size] = _next^_prev;
+
+            if (_prev == -1) {
+                _first = _size;
+            } else {
+                _link[_prev] = _link[_prev] ^ _size ^ _next;
+            }
+
+            if (_next == -1) {
+                _last = _size;
+            } else {
+                _link[_next] = _link[_next] ^ _size ^ _prev;
+            }
+            _prev = _size;
+            _size++;
         }
 
 

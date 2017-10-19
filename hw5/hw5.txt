@@ -4,24 +4,28 @@ HW #5.
 Question D.
 
 1.
-
+Theta (x^2)
 
 2.
-
+Theta (log(x))
 
 3.
-
+Theta (N^2)
 
 4.
-
+Theta (M+N)
 
 5.
-
+Theta (nlog(n))
 
 6.
 
 
 7.
-
+Polynomial p(x) has highest degree term a*x^n
+log(a*b*x^n) >= log(p(x)) for some large b
+log(a*b) + nlog(x) >= log(p(x))
+nlog(x) >= log(p(x)) - log(a*b)
+therefore Olog(x) >= log(p(x))
 
 8.

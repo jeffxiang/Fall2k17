@@ -2,7 +2,7 @@ import java.util.List;
 
 /**
  * Implementation of a BST based String Set.
- * @author
+ * @author Jeff Xiang
  */
 public class BSTStringSet implements StringSet {
     /** Creates a new empty set. */
