@@ -119,73 +119,119 @@ public class ArrayHeap<T> {
 
     /* Returns the index of the node to the left of the node at i. */
     private int getLeftOf(int i) {
-        //YOUR CODE HERE
-        return 0;
+        return i*2;
     }
 
     /* Returns the index of the node to the right of the node at i. */
     private int getRightOf(int i) {
-        //YOUR CODE HERE
-        return 0;
+        return (i*2)+1;
     }
 
     /* Returns the index of the node that is the parent of the node at i. */
     private int getParentOf(int i) {
-        //YOUR CODE HERE
-        return 0;
+        return i/2;
     }
 
     /* Adds the given node as a left child of the node at the given index. */
     private void setLeft(int index, Node n) {
-        //YOUR CODE HERE
+        setNode(getLeftOf(index), n);
     }
 
     /* Adds the given node as the right child of the node at the given index. */
     private void setRight(int index, Node n) {
-        //YOUR CODE HERE
+        setNode(getRightOf(index), n);
     }
 
     /** Returns the index of the node with smaller priority. Precondition: not
       * both nodes are null. */
     private int min(int index1, int index2) {
-        //YOUR CODE HERE
-        return 0;
+        Node n1 = getNode(index1);
+        Node n2 = getNode(index2);
+        if (n1 == null) {
+            return index2;
+        }
+        if (n2 == null) {
+            return index1;
+        }
+        if (n1.priority() > n2.priority()) {
+            return index2;
+        }
+        return index1;
     }
 
     /* Returns the Node with the smallest priority value, but does not remove it
      * from the heap. */
     public Node peek() {
-        //YOUR CODE HERE
-        return null;
+        return getNode(1);
     }
 
     /* Bubbles up the node currently at the given index. */
     private void bubbleUp(int index) {
-        //YOUR CODE HERE
+        if (index == 1) {
+            return;
+        }
+        while (min(index, getParentOf(index)) == index) {
+            swap(index, getParentOf(index));
+            index = getParentOf(index);
+            if (index == 1) {
+                break;
+            }
+        }
     }
 
     /* Bubbles down the node currently at the given index. */
     private void bubbleDown(int index) {
-        //YOUR CODE HERE
+        if (getLeftOf(index) > size() && getRightOf(index) > size()) {
+            return;
+        }
+        int minchildindex = min(getLeftOf(index), getRightOf(index));
+        while (min(index, minchildindex) == minchildindex) {
+            swap(index, minchildindex);
+            index = minchildindex;
+            if (getLeftOf(index) > size() || getRightOf(index) > size()) {
+                break;
+            }
+            minchildindex = min(getLeftOf(index), getRightOf(index));
+        }
     }
 
     /* Inserts an item with the given priority value. Same as enqueue, or offer. */
     public void insert(T item, double priority) {
-        //YOUR CODE HERE
+        Node toinsert = new Node(item, priority);
+        setNode(size() + 1, toinsert);
+        bubbleUp(size());
     }
 
     /* Returns the element with the smallest priority value, and removes it from
      * the heap. Same as dequeue, or poll. */
     public T removeMin() {
-        //YOUR CODE HERE
-        return null;
+        Node result = peek();
+        swap(1, size());
+        removeNode(size());
+        if (size() >= 1) {
+            bubbleDown(1);
+        }
+        return result.item();
     }
 
     /* Changes the node in this heap with the given item to have the given
      * priority. You can assume the heap will not have two nodes with the same
      * item. Check for item equality with .equals(), not == */
     public void changePriority(T item, double priority) {
-        //YOUR CODE HERE
+        for (int i = 1; i <= size(); i++) {
+            Node currnode = getNode(i);
+            T currnodeitem = currnode.item();
+            if (currnodeitem.equals(item)) {
+                currnode.setPriority(priority);
+                setNode(i, currnode);
+                if (min(i, getParentOf(i)) == i) {
+                    bubbleUp(i);
+                } else {
+                    bubbleDown(i);
+                }
+                break;
+            }
+        }
     }
 
 }
