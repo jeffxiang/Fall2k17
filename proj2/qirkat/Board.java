@@ -21,9 +21,12 @@ import static qirkat.Move.*;
  */
 class Board extends Observable {
 
+    /** Size of the board. */
+    private static int _size;
+
     /** A new, cleared board at the start of the game. */
     Board() {
-        // FIXME?
+        _size = 5;
         clear();
     }
 

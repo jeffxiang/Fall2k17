@@ -108,12 +108,13 @@ class Move {
             return move0;
         }
         if (move0.isVestigial()) {
-            return null; // FIXME
+            return move(move0.col0(), move0.row0(),
+                    move1.col0(), move1.row0(), move1);
         }
         if (move0.jumpTail() == null) {
-            return null; // FIXME
+            return null; //FIXME
         } else {
-            return null; // FIXME
+            return null; //FIXME
         }
 
     }

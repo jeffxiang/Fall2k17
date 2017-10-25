@@ -188,7 +188,7 @@ class Game {
 
     /** Perform the command 'clear'. */
     void doClear(String[] unused) {
-        // FIXME
+        _state = SETUP;
     }
 
     /** Perform the command 'set OPERANDS[0] OPERANDS[1]'. */
