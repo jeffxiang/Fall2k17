@@ -17,16 +17,13 @@ import static qirkat.Move.*;
  *  counting from 0).
  *
  *  Moves on this board are denoted by Moves.
- *  @author
+ *  @author Jeff Xiang
  */
 class Board extends Observable {
 
-    /** Size of the board. */
-    private static int _size;
 
     /** A new, cleared board at the start of the game. */
     Board() {
-        _size = 5;
         clear();
     }
 
@@ -46,8 +43,7 @@ class Board extends Observable {
     void clear() {
         _whoseMove = WHITE;
         _gameOver = false;
-
-        // FIXME
+        _board = new PieceColor[Move.SIDE*Move.SIDE];
 
         setChanged();
         notifyObservers();
@@ -60,7 +56,9 @@ class Board extends Observable {
 
     /** Copy B into me. */
     private void internalCopy(Board b) {
-        // FIXME
+        for (int i = 0; i < _board.length; i++) {
+            _board[i] = b._board[i];
+        }
     }
 
     /** Set my contents as defined by STR.  STR consists of 25 characters,
@@ -113,31 +111,39 @@ class Board extends Observable {
      *  and '1' <= R <= '5'.  */
     PieceColor get(char c, char r) {
         assert validSquare(c, r);
-        return get(index(c, r)); // FIXME?
+        return get(index(c, r));
     }
 
     /** Return the current contents of the square at linearized index K. */
     PieceColor get(int k) {
         assert validSquare(k);
-        return null; // FIXME
+        return _board[k];
     }
 
     /** Set get(C, R) to V, where 'a' <= C <= 'e', and
      *  '1' <= R <= '5'. */
     private void set(char c, char r, PieceColor v) {
         assert validSquare(c, r);
-        set(index(c, r), v);  // FIXME?
+        set(index(c, r), v);
     }
 
     /** Set get(K) to V, where K is the linearized index of a square. */
     private void set(int k, PieceColor v) {
         assert validSquare(k);
-        // FIXME
+        _board[k] = v;
     }
 
     /** Return true iff MOV is legal on the current board. */
     boolean legalMove(Move mov) {
-        return false; // FIXME
+        int fromindex = mov.fromIndex();
+        int toindex = mov.toIndex();
+
+        int fromcol = mov.col0();
+        int fromrow = mov.row0();
+        int tocol = mov.col1();
+        int torow = mov.row1();
+
+        return false;
     }
 
     /** Return a list of all legal moves from the current position. */
@@ -266,6 +272,9 @@ class Board extends Observable {
 
     /** Set true when game ends. */
     private boolean _gameOver;
+
+    /** Represents contents of the game board. */
+    private PieceColor[] _board;
 
     /** Convenience value giving values of pieces at each ordinal position. */
     static final PieceColor[] PIECE_VALUES = PieceColor.values();

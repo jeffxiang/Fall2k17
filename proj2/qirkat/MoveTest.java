@@ -23,14 +23,57 @@ public class MoveTest {
     public void testMove2() {
         Move vestigialmove = move('c', '1', 'c', '1');
         Move move2 = move('c', '3', 'c', '5');
-        Move move3 = move('c','5', 'c', '3');
+        Move move3 = move('a','1', 'a', '3');
+        Move afterm4 = move('a', '5', 'c', '5');
+        Move move4 = move('a', '3', 'a', '5', afterm4);
         Move result1 = move(vestigialmove, move2);
         Move expected1 = move('c', '1', 'c', '3', move2);
         assertTrue(result1.equals(expected1));
-        Move result2 = move(move3, vestigialmove);
-        Move nextjump2 = move('c', '3','c', '1');
-        Move expected2 = move('c', '5', 'c', '3', nextjump2);
+        Move result2 = move(move3, move4);
+        Move expected2 = move('a', '1', 'a', '3',
+                move('a', '3', 'a','5',
+                        move('a', '5', 'c', '5')));
         assertTrue(result2.equals(expected2));
+
+        Move movec = move('a', '5', 'c', '5');
+        Move moveb = move('a', '3', 'a', '5', movec);
+        Move movea = move('a', '1', 'a', '3', moveb);
+
+        Move movef = move('c', '1', 'e', '1');
+        Move movee = move('c', '3', 'c', '1', movef);
+        Move moved = move('c', '5', 'c', '3', movee);
+
+        Move hugeexpected = move('a', '1', 'a', '3',
+                move('a', '3', 'a', '5',
+                        move('a', '5', 'c', '5',
+                                move('c', '5', 'c', '3',
+                                        move('c', '3', 'c', '1',
+                                                move('c', '1', 'e', '1'))))));
+
+        Move hugeresult = move(movea, moved);
+        assertTrue(hugeresult.equals(hugeexpected));
+    }
+
+    @Test
+    public void testIsDirectionMove() {
+        Move move0 = move('a', '2', 'a', '1');
+        Move move1 = move('c', '3', 'b', '3');
+        Move move2 = move('b', '1', 'c', '1');
+        assertFalse(move0.isRightMove());
+        assertTrue(move1.isLeftMove());
+        assertTrue(move2.isRightMove());
+        assertFalse(move2.isLeftMove());
+    }
+
+    @Test
+    public void testJumpedIndex() {
+        Move move0 = move('a', '2', 'a', '4');
+        int result0 = move0.jumpedIndex();
+        assertEquals(10, result0);
+
+        Move move1 = move('a', '2', 'c', '4');
+        int result1 = move1.jumpedIndex();
+        assertEquals(11, result1);
     }
 
     @Test

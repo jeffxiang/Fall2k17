@@ -1,17 +1,20 @@
 package qirkat;
 
 import static java.lang.Math.abs;
+
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.List;
 
 /** Represents a Qirkat move. There is one Move object created for
  *  each distinct Move.  A "vestigial" move represents a single board
  *  position, as opposed to a move (its starting and ending rows are
  *  equal, likewise columns).
- *  @author
+ *  @author Jeff Xiang
  */
 class Move {
 
@@ -112,9 +115,10 @@ class Move {
                     move1.col0(), move1.row0(), move1);
         }
         if (move0.jumpTail() == null) {
-            return null; //FIXME
+            return move(move0.col0(), move0.row0(), move0.col1(), move0.row1(), move1);
         } else {
-            return null; //FIXME
+            return move(move0.col0(), move0.row0(), move0.col1(), move0.row1(),
+                    move(move0.jumpTail(), move1));
         }
 
     }
@@ -160,13 +164,19 @@ class Move {
     /** Return true iff this is a horizontal, non-capturing move to
      *  the left. */
     boolean isLeftMove() {
-        return false; // FIXME
+        if (this.toIndex() == this.fromIndex() - 1) {
+            return true;
+        }
+        return false;
     }
 
     /** Return true iff this is a horizontal, non-capturing move
      *  to the right. */
     boolean isRightMove() {
-        return false; // FIXME
+        if (this.toIndex() == this.fromIndex() + 1) {
+            return true;
+        }
+        return false;
     }
 
     /** Returns the source column. */
@@ -192,13 +202,33 @@ class Move {
     /** For a jump, returns the row of the jumped-over square for the
      *  first leg of the jump.  For a non-capturing move, same as row1(). */
     char jumpedRow() {
-        return '1';  // FIXME
+        int sourcerow = this.row0();
+        int destrow = this.row1();
+        int result;
+        if (sourcerow - destrow == -2) {
+            result = sourcerow + 1;
+        } else if (sourcerow - destrow == 2) {
+            result = sourcerow - 1;
+        } else {
+            result = destrow;
+        }
+        return (char) result;
     }
 
     /** For a jump, returns the column of the jumped-over square for the
      *  first leg of the jump.  For a non-capturing move, same as col1(). */
     char jumpedCol() {
-        return 'a'; // FIXME
+        char sourcecol = this.col0();
+        char destcol = this.col1();
+        int result;
+        if (sourcecol > destcol) {
+            result = sourcecol - 1;
+        } else if (sourcecol < destcol) {
+            result = sourcecol + 1;
+        } else {
+            result = destcol;
+        }
+        return (char) result;
     }
 
     /** Return the linearized index of my source square. */
@@ -272,7 +302,23 @@ class Move {
 
     /** Write my string representation into OUT. */
     private void toString(Formatter out) {
-        out.format("???"); // FIXME
+        String colrow0 = Character.toString(this.col0()) + Character.toString(this.row0());
+        String colrow1 = Character.toString(this.col1()) + Character.toString(this.row1());
+        Move thismove = this;
+        List<String> moves = new ArrayList<>();
+        moves.add(colrow0);
+        moves.add("-");
+        moves.add(colrow1);
+        while (thismove.jumpTail() != null) {
+            thismove = thismove.jumpTail();
+            String currcolrow1 = Character.toString(thismove.col1()) + Character.toString(thismove.row1());
+            moves.add("-");
+            moves.add(currcolrow1);
+        }
+
+        String result = moves.toString().replaceAll("\\]|\\[|\\, ", "");
+
+        out.format("%s", result);
     }
 
     /** Set me to COL0 ROW0 - COL1 ROW1 - NEXTJUMP. */
