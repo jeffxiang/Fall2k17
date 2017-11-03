@@ -59,7 +59,7 @@ public class BSTStringSetRangeTest {
         for (String i : WORDS1) {
             _S.put(i);
         }
-        System.exit(ucb.junit.textui.runClasses(BSTStringSetRangeTest.class));
+        System.exit(ucb.junit.textui.runClasses(BSTStringSet.class));
     }
 
     private static final ArrayList<String> WORDS1 = new ArrayList<>();

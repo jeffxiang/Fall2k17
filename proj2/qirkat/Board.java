@@ -24,11 +24,14 @@ class Board extends Observable {
 
     /** A new, cleared board at the start of the game. */
     Board() {
+        _board = new PieceColor[Move.SIDE*Move.SIDE];
         clear();
     }
 
     /** A copy of B. */
     Board(Board b) {
+        _board = new PieceColor[Move.SIDE*Move.SIDE];
+        _whoseMove = b.whoseMove();
         internalCopy(b);
     }
 
@@ -43,7 +46,7 @@ class Board extends Observable {
     void clear() {
         _whoseMove = WHITE;
         _gameOver = false;
-        _board = new PieceColor[Move.SIDE*Move.SIDE];
+        setPieces("wwwww wwwww bb-ww bbbbb bbbbb", _whoseMove);
 
         setChanged();
         notifyObservers();
@@ -77,7 +80,7 @@ class Board extends Observable {
             throw new IllegalArgumentException("bad board description");
         }
 
-        // FIXME
+        _whoseMove = nextMove;
 
         for (int k = 0; k < str.length(); k += 1) {
             switch (str.charAt(k)) {
@@ -135,15 +138,32 @@ class Board extends Observable {
 
     /** Return true iff MOV is legal on the current board. */
     boolean legalMove(Move mov) {
-        int fromindex = mov.fromIndex();
-        int toindex = mov.toIndex();
-
-        int fromcol = mov.col0();
-        int fromrow = mov.row0();
-        int tocol = mov.col1();
-        int torow = mov.row1();
-
-        return false;
+        if (mov.isJump()) {
+            return checkJump(mov, false);
+        }
+        char fromcol = mov.col0();
+        char fromrow = mov.row0();
+        char tocol = mov.col1();
+        char torow = mov.row1();
+        PieceColor frompiece = _board[index(fromcol, fromrow)];
+        PieceColor topiece = _board[index(tocol, torow)];
+        if (frompiece != whoseMove() || topiece.isPiece()) {
+            return false;
+        }
+        if (frompiece == WHITE) {
+            if (torow < fromrow) {
+                return false;
+            }
+        }
+        if (frompiece == BLACK) {
+            if (torow > fromrow) {
+                return false;
+            }
+        }
+        if (frompiece.prevIndex() == index(tocol, torow)) {
+            return false;
+        }
+        return true;
     }
 
     /** Return a list of all legal moves from the current position. */
@@ -171,8 +191,20 @@ class Board extends Observable {
 
     /** Add all legal non-capturing moves from the position
      *  with linearized index K to MOVES. */
-    private void getMoves(ArrayList<Move> moves, int k) {
-        // FIXME
+    void getMoves(ArrayList<Move> moves, int k) {
+        char col = col(k);
+        char row = row(k);
+        for (int c = col - 1; c <= col + 1; c++) {
+            for (int r = row - 1; r <= row + 1; r++) {
+                if (validSquare((char) c, (char) r) &&
+                        index(col, row) != index((char) c, (char) r)) {
+                    Move movehere = Move.move(col, row, (char) c, (char) r);
+                    if (legalMove(movehere)) {
+                        moves.add(movehere);
+                    }
+                }
+            }
+        }
     }
 
     /** Add all legal captures from the position with linearized index K
@@ -185,10 +217,33 @@ class Board extends Observable {
      *  MOV must be a jump or null.  If ALLOWPARTIAL, allow jumps that
      *  could be continued and are valid as far as they go.  */
     boolean checkJump(Move mov, boolean allowPartial) {
-        if (mov == null) {
-            return true;
+        Board copyboard = new Board(this);
+        while (mov != null) {
+            if (!mov.isJump()) {
+                return false;
+            }
+            char fromcol = mov.col0();
+            char fromrow = mov.row0();
+            char tocol = mov.col1();
+            char torow = mov.row1();
+            int jumpedindex = mov.jumpedIndex();
+            PieceColor piece = copyboard._board[index(fromcol, fromrow)];
+            if (!copyboard.jumpPossible(fromcol, fromrow)) {
+                return false;
+            }
+            copyboard.set(tocol, torow, piece);
+            copyboard.set(fromcol, fromrow, EMPTY);
+            copyboard.set(jumpedindex, EMPTY);
+            if (mov.jumpTail() == null) {
+                if (!allowPartial) {
+                    if (copyboard.jumpPossible(tocol, torow)) {
+                        return false;
+                    }
+                }
+            }
+            mov = mov.jumpTail();
         }
-        return false; // FIXME
+        return true;
     }
 
     /** Return true iff a jump is possible for a piece at position C R. */
@@ -196,10 +251,145 @@ class Board extends Observable {
         return jumpPossible(index(c, r));
     }
 
+    /** Return true iff a jump is possible for position C R. */
+    boolean jumpPossibleempty(char c, char r) {
+        return jumpPossibleempty(index(c, r));
+    }
+
     /** Return true iff a jump is possible for a piece at position with
      *  linearized index K. */
     boolean jumpPossible(int k) {
-        return false; // FIXME
+        if (_board[k] != whoseMove()) {
+            return false;
+        }
+        char col = col(k);
+        char row = row(k);
+        if (isRadiatingSpot(k)) {
+            for (int c = col - 2; c <= col + 2; c += 2) {
+                    for (int r = row - 2; r <= row + 2; r += 2) {
+                        if (validSquare((char) c, (char) r) &&
+                                !_board[index((char) c, (char) r)].isPiece()) {
+                            Move jumpmove = move(col, row, (char) c, (char) r);
+                            int jumpedindex = jumpmove.jumpedIndex();
+                            PieceColor jumpedpiece = _board[jumpedindex];
+                            if (jumpedpiece == _whoseMove.opposite()) {
+                                return true;
+                            }
+                        }
+                    }
+            }
+        } else if (!isRadiatingSpot(k)) {
+            int leftcol = col - 2;
+            int rightcol = col + 2;
+            int uprow = row + 2;
+            int downrow = row - 2;
+            if (validSquare((char) leftcol, row) &&
+                    !_board[index((char) leftcol, row)].isPiece()) {
+                Move jumpmove = move(col, row, (char) leftcol, row);
+                int jumpedindex = jumpmove.jumpedIndex();
+                PieceColor jumpedpiece = _board[jumpedindex];
+                if (jumpedpiece == _whoseMove.opposite()) {
+                    return true;
+                }
+            }
+            if (validSquare((char) rightcol, row) &&
+                    !_board[index((char) rightcol, row)].isPiece()) {
+                Move jumpmove = move(col, row, (char) rightcol, row);
+                int jumpedindex = jumpmove.jumpedIndex();
+                PieceColor jumpedpiece = _board[jumpedindex];
+                if (jumpedpiece == _whoseMove.opposite()) {
+                    return true;
+                }
+            }
+            if (validSquare(col, (char) uprow) &&
+                    !_board[index(col, (char) uprow)].isPiece()) {
+                Move jumpmove = move(col, row, col, (char) uprow);
+                int jumpedindex = jumpmove.jumpedIndex();
+                PieceColor jumpedpiece = _board[jumpedindex];
+                if (jumpedpiece == _whoseMove.opposite()) {
+                    return true;
+                }
+            }
+            if (validSquare(col, (char) downrow) &&
+                    !_board[index(col, (char) downrow)].isPiece()) {
+                Move jumpmove = move(col, row, col, (char) downrow);
+                int jumpedindex = jumpmove.jumpedIndex();
+                PieceColor jumpedpiece = _board[jumpedindex];
+                if (jumpedpiece == _whoseMove.opposite()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** Return true iff a jump is possible from a piece at linearized
+     * index K, regardless of whether a piece exists there already */
+    boolean jumpPossibleempty(int k) {
+        char col = col(k);
+        char row = row(k);
+        if (isRadiatingSpot(k)) {
+            for (int c = col - 2; c <= col + 2; c += 2) {
+                if (_whoseMove == WHITE) {
+                    for (int r = row; r <= row + 2; r += 2) {
+                        if (validSquare((char) c, (char) r) &&
+                                !_board[index((char) c, (char) r)].isPiece()) {
+                            Move jumpmove = move(col, row, (char) c, (char) r);
+                            int jumpedindex = jumpmove.jumpedIndex();
+                            PieceColor jumpedpiece = _board[jumpedindex];
+                            if (jumpedpiece == BLACK) {
+                                return true;
+                            }
+                        }
+                    }
+                } else if (_whoseMove == BLACK) {
+                    for (int r = row; r >= row - 2; r -= 2) {
+                        if (validSquare((char) c, (char) r) &&
+                                !_board[index((char) c, (char) r)].isPiece()) {
+                            Move jumpmove = move(col, row, (char) c, (char) r);
+                            int jumpedindex = jumpmove.jumpedIndex();
+                            PieceColor jumpedpiece = _board[jumpedindex];
+                            if (jumpedpiece == WHITE) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (!isRadiatingSpot(k)) {
+            for (int c = col - 2; c <= col + 2; c += 2) {
+                int r = row;
+                if (_whoseMove == WHITE) {
+                    if (c == col) {
+                        r = row + 2;
+                    }
+                    if (validSquare((char) c, (char) r) &&
+                            !_board[index((char) c, (char) r)].isPiece()) {
+                        Move jumpmove = move(col, row, (char) c, (char) r);
+                        int jumpedindex = jumpmove.jumpedIndex();
+                        PieceColor jumpedpiece = _board[jumpedindex];
+                        if (jumpedpiece == BLACK) {
+                            return true;
+                        }
+                    }
+                }
+                if (_whoseMove == BLACK) {
+                    if (c == col) {
+                        r = row - 2;
+                    }
+                    if (validSquare((char) c, (char) r) &&
+                            !_board[index((char) c, (char) r)].isPiece()) {
+                        Move jumpmove = move(col, row, (char) c, (char) r);
+                        int jumpedindex = jumpmove.jumpedIndex();
+                        PieceColor jumpedpiece = _board[jumpedindex];
+                        if (jumpedpiece == WHITE) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /** Return true iff a jump is possible from the current board. */
@@ -210,6 +400,27 @@ class Board extends Observable {
             }
         }
         return false;
+    }
+
+    /** Return true iff a position at C, R is radiating. */
+    boolean isRadiatingSpot(char c, char r) {
+        if (!validSquare(c, r)) {
+            return false;
+        } else if (r % 2 != 0) {
+            if (c == 'b' || c == 'd') {
+                return false;
+            }
+        } else if (r % 2 == 0) {
+            if (c == 'a' || c == 'c' || c == 'e') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Return true iff a position at linearized index K is a radiating spot. */
+    boolean isRadiatingSpot(int k) {
+        return isRadiatingSpot(col(k), row(k));
     }
 
     /** Return the color of the player who has the next move.  The
@@ -233,8 +444,23 @@ class Board extends Observable {
     /** Make the Move MOV on this Board, assuming it is legal. */
     void makeMove(Move mov) {
         assert legalMove(mov);
-
-        // FIXME
+        while (mov != null) {
+            char fromcol = mov.col0();
+            char fromrow = mov.row0();
+            char tocol = mov.col1();
+            char torow = mov.row1();
+            int fromindex = index(fromcol, fromrow);
+            int toindex = index(tocol, torow);
+            int jumpedindex = mov.jumpedIndex();
+            this.set(fromindex, EMPTY);
+            _board[fromindex].previndex = -1;
+            this.set(jumpedindex, EMPTY);
+            _board[jumpedindex].previndex = -1;
+            this.set(toindex, _whoseMove);
+            _board[toindex].previndex = fromindex;
+            mov = mov.jumpTail();
+        }
+        _whoseMove = _whoseMove.opposite();
 
         setChanged();
         notifyObservers();
@@ -256,9 +482,27 @@ class Board extends Observable {
     /** Return a text depiction of the board.  If LEGEND, supply row and
      *  column numbers around the edges. */
     String toString(boolean legend) {
-        Formatter out = new Formatter();
-        // FIXME
-        return out.toString();
+        String result = "";
+        String currstring = "";
+        for (int i = 0; i < _board.length; i++) {
+            if (_board[i] == WHITE) {
+                currstring = currstring.concat(" w");
+            }
+            if (_board[i] == BLACK) {
+                currstring = currstring.concat(" b");
+            }
+            if (!_board[i].isPiece()) {
+                currstring = currstring.concat(" -");
+            }
+            if ((i + 1) % 5 == 0) {
+                if (i != 4) {
+                    currstring = currstring.concat("\n ");
+                }
+                result = currstring.concat(result);
+                currstring = "";
+            }
+        }
+        return " " + result;
     }
 
     /** Return true iff there is a move for the current player. */
