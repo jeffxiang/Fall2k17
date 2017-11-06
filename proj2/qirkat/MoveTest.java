@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 import static qirkat.Move.*;
 
 /** Test Move creation.
- *  @author
+ *  @author Jeff Xiang
  */
 public class MoveTest {
 
@@ -23,7 +23,7 @@ public class MoveTest {
     public void testMove2() {
         Move vestigialmove = move('c', '1', 'c', '1');
         Move move2 = move('c', '3', 'c', '5');
-        Move move3 = move('a','1', 'a', '3');
+        Move move3 = move('a', '1', 'a', '3');
         Move afterm4 = move('a', '5', 'c', '5');
         Move move4 = move('a', '3', 'a', '5', afterm4);
         Move result1 = move(vestigialmove, move2);
@@ -31,7 +31,7 @@ public class MoveTest {
         assertTrue(result1.equals(expected1));
         Move result2 = move(move3, move4);
         Move expected2 = move('a', '1', 'a', '3',
-                move('a', '3', 'a','5',
+                move('a', '3', 'a', '5',
                         move('a', '5', 'c', '5')));
         assertTrue(result2.equals(expected2));
 
@@ -97,5 +97,11 @@ public class MoveTest {
         assertEquals("a3-a5", parseMove("a3-a5").toString());
         assertEquals("a3-a5-c3", parseMove("a3-a5-c3").toString());
         assertEquals("a3-a5-c3-e1", parseMove("a3-a5-c3-e1").toString());
+    }
+
+    @Test
+    public void testTailIndex() {
+        assertEquals(0, parseMove("c1-c3-a3-a1").tailIndex());
+        assertEquals(10, parseMove("a1-c1-c3-a3").tailIndex());
     }
 }

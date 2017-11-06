@@ -30,15 +30,8 @@ enum PieceColor {
         boolean isPiece() {
             return true;
         }
+
     };
-
-
-    //* Previous position linearized index. */
-    int previndex = -1;
-
-    int prevIndex() {
-        return previndex;
-    }
 
     /** Return the piece color of my opponent, if defined. */
     PieceColor opposite() {

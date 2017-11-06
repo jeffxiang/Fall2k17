@@ -4,7 +4,7 @@ import static qirkat.PieceColor.*;
 import static qirkat.Command.Type.*;
 
 /** A Player that receives its moves from its Game's getMoveCmnd method.
- *  @author
+ *  @author Jeff Xiang
  */
 class Manual extends Player {
 
@@ -17,7 +17,13 @@ class Manual extends Player {
 
     @Override
     Move myMove() {
-        return null; // FIXME
+        Game mygame = this.game();
+        Command mycommand = mygame.getMoveCmnd(_prompt);
+        System.out.println(mycommand);
+        if (mycommand.commandType() == PIECEMOVE) {
+            return Move.parseMove(mycommand.operands()[0]);
+        }
+        return null;
     }
 
     /** Identifies the player serving as a source of input commands. */

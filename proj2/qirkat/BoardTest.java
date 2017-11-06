@@ -4,10 +4,9 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /** Tests of the Board class.
- *  @author
+ *  @author Jeff Xiang
  */
 public class BoardTest {
 
@@ -53,9 +52,10 @@ public class BoardTest {
         for (int i = 0; i < GAME1.length; i += 1) {
             b0.undo();
         }
-        assertEquals("failed to return to start", b1, b0);
+        assertEquals("failed to return to start", b1.toString(), b0.toString());
         makeMoves(b0, GAME1);
-        assertEquals("second pass failed to reach same position", b2, b0);
+        assertEquals("second pass failed to reach same position",
+                b2.toString(), b0.toString());
     }
 
     @Test
@@ -88,35 +88,19 @@ public class BoardTest {
         assertFalse(b3.jumpPossible(1));
         assertFalse(b3.jumpPossible('b', '2'));
         assertFalse(b3.jumpPossible());
-    }
-
-    @Test
-    public void testJumpPossibleempty() {
-        Board b = new Board();
-        b.setPieces("---w- -w-b- -wb-- --b-w -----", PieceColor.WHITE);
-        assertTrue(b.jumpPossibleempty(3));
-        assertTrue(b.jumpPossibleempty(6));
-        assertTrue(b.jumpPossibleempty(8));
-        assertFalse(b.jumpPossibleempty(17));
-        assertTrue(b.jumpPossibleempty(2));
-        assertFalse(b.jumpPossibleempty(10));
-        assertTrue(b.jumpPossibleempty('c', '3'));
-        assertFalse(b.jumpPossibleempty(20));
-        assertFalse(b.jumpPossibleempty(1));
-        assertFalse(b.jumpPossibleempty(19));
-        Board b2 = new Board();
-        b2.setPieces("---w- -w-b- -w--- --b-- -----", PieceColor.BLACK);
-        assertTrue(b2.jumpPossibleempty(11));
-        Board b3 = new Board();
-        assertFalse(b3.jumpPossibleempty(1));
-        assertFalse(b3.jumpPossibleempty('b', '2'));
+        Board b4 = new Board();
+        b4.setPieces("----- -ww-- -bbb- --b-- -----", PieceColor.WHITE);
+        assertFalse(b4.jumpPossible(7));
     }
 
     @Test
     public void testSetPieces() {
         Board b = new Board();
-        b.setPieces("---w- -w-b- -wb-- --b-- -----", PieceColor.WHITE);
-        String boardstring = "  - - - - -\n  - - b - -\n  - w b - -\n  - w - b -\n  - - - w -";
+        b.setPieces("---w- -w-b- -wb-- --b-- -----",
+                PieceColor.WHITE);
+        String boardstring =
+                "  - - - - -\n  - - b - -\n  "
+                        + "- w b - -\n  - w - b -\n  - - - w -";
         assertEquals(b.get(3), PieceColor.WHITE);
         assertEquals(b.get(12), PieceColor.BLACK);
         assertEquals(boardstring, b.toString());
@@ -178,11 +162,21 @@ public class BoardTest {
         assertFalse(b2.legalMove(move10));
 
         Board b3 = new Board();
-        b3.setPieces("---w- -w-b- -wb-- --b-- -----", PieceColor.WHITE);
-        String[] moves = {"b3-a3", "c3-c2"};
+        b3.setPieces("---w- -w-b- -wb-- -wbw- --w--", PieceColor.WHITE);
+        String[] moves = {"b3-a3", "c3-d3"};
         makeMoves(b3, moves);
         Move illegalmove = Move.parseMove("a3-b3");
         assertFalse(b3.legalMove(illegalmove));
+        b3.makeMove(Move.parseMove("a3-a4"));
+        assertTrue(b3.whoseMove() == PieceColor.BLACK);
+        assertFalse(b3.legalMove(Move.parseMove("d3-c3")));
+        b3.makeMove(Move.parseMove("d2-e1"));
+        b3.makeMove(Move.parseMove("b2-a3"));
+        b3.makeMove(Move.parseMove("d3-d5-b5-b3"));
+        b3.makeMove(Move.parseMove("d1-c1"));
+        b3.makeMove(Move.parseMove("b3-c3"));
+        b3.makeMove(Move.parseMove("c1-b1"));
+        assertFalse(b3.legalMove(Move.parseMove("c3-b3")));
     }
 
     @Test
@@ -209,5 +203,52 @@ public class BoardTest {
         assertTrue(moves2.contains(Move.parseMove("d2-c3")));
         assertTrue(moves2.contains(Move.parseMove("d3-c3")));
         assertEquals(4, moves2.size());
+    }
+
+    @Test
+    public void testOneJumps() {
+        Board b = new Board();
+        b.setPieces("----- -ww-- -bbb- --b-- -----", PieceColor.WHITE);
+        ArrayList<Move> l1 = b.getOneJumps(7);
+        ArrayList<Move> l2 = b.getOneJumps(6);
+        assertEquals(0, l1.size());
+        assertEquals(2, l2.size());
+        assertTrue(l2.contains(Move.parseMove("b2-b4")));
+        assertTrue(l2.contains(Move.parseMove("b2-d4")));
+        b.setPieces("----- -ww-- -bbb- --b-- -----", PieceColor.BLACK);
+        l1 = b.getOneJumps(11);
+        assertEquals(1, l1.size());
+        assertTrue(l1.contains(Move.parseMove("b3-b1")));
+    }
+
+    @Test
+    public void testGetJumps() {
+        Board b = new Board();
+        b.setPieces("----- -ww-- -bbb- --b-- -----", PieceColor.WHITE);
+        ArrayList<Move> moves = new ArrayList<>();
+        b.getJumps(moves, 6);
+        assertEquals(5, moves.size());
+        assertTrue(moves.contains(Move.parseMove("b2-d4-d2")));
+        b.setPieces("----- -ww-- -bbb- --b-- -----", PieceColor.BLACK);
+        moves.clear();
+        b.getJumps(moves, 12);
+        assertTrue(moves.contains(Move.parseMove("c3-c1-a3")));
+        assertTrue(moves.size() == 2);
+    }
+
+    @Test
+    public void testGetJumpHelper() {
+        Board b = new Board();
+        b.setPieces("----- -ww-- -bbb- --b-- -----", PieceColor.WHITE);
+        ArrayList<Move> moves = new ArrayList<>();
+        b.getJumpsHelper(moves, 6);
+        System.out.println(moves);
+    }
+
+    @Test
+    public void testGetMoves1() {
+        Board b = new Board();
+        b.setPieces("bbb-- bwb-- bbb-- ----- -----", PieceColor.WHITE);
+        assertTrue(b.isMove());
     }
 }

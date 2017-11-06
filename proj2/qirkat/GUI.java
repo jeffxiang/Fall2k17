@@ -16,7 +16,7 @@ import java.io.IOException;
 import static qirkat.PieceColor.*;
 
 /** The GUI for the Qirkat game.
- *  @author
+ *  @author Jeff Xiang
  */
 class GUI extends TopLevel implements Observer, Reporter {
 

@@ -3,7 +3,7 @@ package qirkat;
 import static qirkat.PieceColor.*;
 
 /** A Player that computes its own moves.
- *  @author
+ *  @author Jeff Xiang
  */
 class AI extends Player {
 
@@ -68,6 +68,21 @@ class AI extends Player {
 
     /** Return a heuristic value for BOARD. */
     private int staticScore(Board board) {
-        return 0; // FIXME
+        int whitecount = 0;
+        int blackcount = 0;
+        String boardstring = board.toString();
+        for (int i = 0; i < boardstring.length(); i++) {
+            if (boardstring.charAt(i) == 'w') {
+                whitecount++;
+            } else if (boardstring.charAt(i) == 'b') {
+                blackcount++;
+            }
+        }
+        if (this.myColor() == WHITE) {
+            return whitecount - blackcount;
+        } else if (this.myColor() == BLACK) {
+            return blackcount - whitecount;
+        }
+        return -1;
     }
 }

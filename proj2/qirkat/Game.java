@@ -17,7 +17,7 @@ import static qirkat.Command.Type.*;
 import static qirkat.GameException.error;
 
 /** Controls the play of the game.
- *  @author
+ *  @author Jeff Xiang
  */
 class Game {
 
@@ -47,14 +47,32 @@ class Game {
                 doCommand();
             }
 
-            // FIXME
+            if (_whiteIsManual) {
+                white = new Manual(this, PieceColor.WHITE);
+            } else {
+                white = new AI(this, PieceColor.WHITE);
+            }
+            if (_blackIsManual) {
+                black = new Manual(this, PieceColor.BLACK);
+            } else {
+                black = new AI(this, PieceColor.BLACK);
+            }
+            Player currplayer;
+            if (_board.whoseMove() == PieceColor.WHITE) {
+                currplayer = white;
+            } else {
+                currplayer = black;
+            }
 
             while (_state != SETUP && !_board.gameOver()) {
-                Move move;
-                move = null; // FIXME
+                currplayer.myMove();
 
                 if (_state == PLAYING) {
-                    _board.makeMove(move);
+                    if (_board.whoseMove() == WHITE) {
+                        currplayer = black;
+                    } else {
+                        currplayer = white;
+                    }
                 }
             }
 
@@ -127,7 +145,20 @@ class Game {
     /** Perform the command 'auto OPERANDS[0]'. */
     void doAuto(String[] operands) {
         _state = SETUP;
-        // FIXME
+        String expr = removeWhitespace(operands[0]);
+        expr = expr.replaceAll("w", "W");
+        expr = expr.replaceAll("b", "B");
+        switch (expr) {
+        case "White":
+            _whiteIsManual = false;
+            break;
+        case "Black":
+            _blackIsManual = false;
+            break;
+        default:
+            reportError("Invalid player entry.");
+            break;
+        }
     }
 
     /** Perform a 'help' command. */
@@ -157,8 +188,12 @@ class Game {
     /** Perform the command 'load OPERANDS[0]'. */
     void doLoad(String[] operands) {
         try {
-            FileReader reader = new FileReader(operands[0]);
-            // FIXME
+            FileReader reader = new FileReader(
+                    "../proj2/testing/" + operands[0]);
+            ReaderSource source = new ReaderSource(reader, false);
+            _inputs.addSource(source);
+            process();
+
         } catch (IOException e) {
             throw error("Cannot open file %s", operands[0]);
         }
@@ -167,7 +202,20 @@ class Game {
     /** Perform the command 'manual OPERANDS[0]'. */
     void doManual(String[] operands) {
         _state = SETUP;
-        // FIXME
+        String expr = removeWhitespace(operands[0]);
+        expr = expr.replaceAll("w", "W");
+        expr = expr.replaceAll("b", "B");
+        switch (expr) {
+        case "White":
+            _whiteIsManual = true;
+            break;
+        case "Black":
+            _blackIsManual = true;
+            break;
+        default:
+            reportError("Invalid player entry.");
+            break;
+        }
     }
 
     /** Exit the program. */
@@ -183,22 +231,64 @@ class Game {
 
     /** Perform the move OPERANDS[0]. */
     void doMove(String[] operands) {
-        // FIXME
+        try {
+            String expr = removeWhitespace(operands[0]);
+            Move move = Move.parseMove(expr);
+            String whomoved = _board.whoseMove().toString();
+            _board.makeMove(move);
+            if (_board.whoseMove() == PieceColor.WHITE) {
+                if (!_whiteIsManual) {
+                    reportMove(whomoved + " moves " + move.toString() + ".");
+                }
+            } else if (_board.whoseMove() == PieceColor.BLACK) {
+                if (!_blackIsManual) {
+                    reportMove(whomoved + " moves " + move.toString() + ".");
+                }
+            }
+        } catch (AssertionError excp) {
+            reportError("Illegal move. Request another move.");
+        }
     }
 
     /** Perform the command 'clear'. */
     void doClear(String[] unused) {
         _state = SETUP;
+        _blackIsManual = true;
+        _whiteIsManual = true;
+    }
+
+    /** Get rid of whitespace from String cmnd and return the
+     * resultant string.
+     * @param cmnd String of command */
+    String removeWhitespace(String cmnd) {
+        return cmnd.replaceAll("\\s*", "");
     }
 
     /** Perform the command 'set OPERANDS[0] OPERANDS[1]'. */
     void doSet(String[] operands) {
-        // FIXME
+        _state = SETUP;
+        String playerturn = removeWhitespace(operands[0]);
+        playerturn = playerturn.replaceAll("w", "W");
+        playerturn = playerturn.replaceAll("b", "B");
+        switch (playerturn) {
+        case "White":
+            _board.setPieces(operands[1], PieceColor.WHITE);
+            break;
+        case "Black":
+            _board.setPieces(operands[1], PieceColor.BLACK);
+            break;
+        default:
+            reportError("Invalid entry");
+            break;
+        }
+
     }
 
     /** Perform the command 'dump'. */
     void doDump(String[] unused) {
-        // FIXME
+        System.out.println("===");
+        System.out.println(_board.toString());
+        System.out.println("===");
     }
 
     /** Execute 'seed OPERANDS[0]' command, where the operand is a string
@@ -210,6 +300,16 @@ class Game {
         } catch (NumberFormatException e) {
             _randoms.setSeed(Long.MAX_VALUE);
         }
+    }
+
+    /** Returns true iff white is manual. */
+    boolean isWhiteManual() {
+        return _whiteIsManual;
+    }
+
+    /** Returns true iff black is manual. */
+    boolean isBlackManual() {
+        return _blackIsManual;
     }
 
     /** Execute the artificial 'error' command. */

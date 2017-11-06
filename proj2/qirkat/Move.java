@@ -115,12 +115,22 @@ class Move {
                     move1.col0(), move1.row0(), move1);
         }
         if (move0.jumpTail() == null) {
-            return move(move0.col0(), move0.row0(), move0.col1(), move0.row1(), move1);
+            return move(move0.col0(), move0.row0(),
+                    move0.col1(), move0.row1(), move1);
         } else {
             return move(move0.col0(), move0.row0(), move0.col1(), move0.row1(),
                     move(move0.jumpTail(), move1));
         }
 
+    }
+
+    /** Return the last (tail) index of this move. */
+    public int tailIndex() {
+        Move copy = this;
+        while (copy._nextJump != null) {
+            copy = copy._nextJump;
+        }
+        return copy.toIndex();
     }
 
     /** Return true iff (C, R) is a valid square designation. */
@@ -302,8 +312,10 @@ class Move {
 
     /** Write my string representation into OUT. */
     private void toString(Formatter out) {
-        String colrow0 = Character.toString(this.col0()) + Character.toString(this.row0());
-        String colrow1 = Character.toString(this.col1()) + Character.toString(this.row1());
+        String colrow0 = Character.toString(this.col0())
+                + Character.toString(this.row0());
+        String colrow1 = Character.toString(this.col1())
+                + Character.toString(this.row1());
         Move thismove = this;
         List<String> moves = new ArrayList<>();
         moves.add(colrow0);
@@ -311,7 +323,8 @@ class Move {
         moves.add(colrow1);
         while (thismove.jumpTail() != null) {
             thismove = thismove.jumpTail();
-            String currcolrow1 = Character.toString(thismove.col1()) + Character.toString(thismove.row1());
+            String currcolrow1 = Character.toString(thismove.col1())
+                    + Character.toString(thismove.row1());
             moves.add("-");
             moves.add(currcolrow1);
         }
@@ -322,7 +335,7 @@ class Move {
     }
 
     /** Set me to COL0 ROW0 - COL1 ROW1 - NEXTJUMP. */
-    private void set(char col0, char row0, char col1, char row1,
+    void set(char col0, char row0, char col1, char row1,
                      Move nextJump) {
         assert col0 >= 'a' && row0 >= '1' && col1 >= 'a' && row1 >= '1'
             && col0 <= 'e' && row0 <= '5' && col1 <= 'e' &&  row1 <= '5';

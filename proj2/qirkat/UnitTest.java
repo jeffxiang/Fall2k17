@@ -3,7 +3,7 @@ package qirkat;
 import ucb.junit.textui;
 
 /** The suite of all JUnit tests for the qirkat package.
- *  @author
+ *  @author Jeff Xiang
  */
 public class UnitTest {
 
@@ -11,7 +11,7 @@ public class UnitTest {
      *  the arguments of runClasses to run other JUnit tests. */
     public static void main(String[] ignored) {
         System.exit(textui.runClasses(MoveTest.class, BoardTest.class,
-                                      CommandTest.class));
+                                      CommandTest.class, GameTest.class));
     }
 
 }
