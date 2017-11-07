@@ -177,6 +177,10 @@ public class BoardTest {
         b3.makeMove(Move.parseMove("b3-c3"));
         b3.makeMove(Move.parseMove("c1-b1"));
         assertFalse(b3.legalMove(Move.parseMove("c3-b3")));
+
+        Board b4 = new Board();
+        b4.setPieces("wwwww wwbww bb-ww bb-bb bbbbb", PieceColor.WHITE);
+        assertFalse(b4.legalMove(Move.parseMove("d3-c4")));
     }
 
     @Test

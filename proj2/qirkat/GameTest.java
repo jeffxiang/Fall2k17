@@ -45,12 +45,8 @@ public class GameTest {
         CommandSources c = new CommandSources();
         TextReporter t = new TextReporter();
         Game g = new Game(b, c, t);
-        String[] operands = {"     c2-c3 "};
+        String[] operands = {"     c4-c3"};
         g.doMove(operands);
-        String[] operands2 = {"c4-c2"};
-        g.doMove(operands2);
-        String[] operands3 = {"d2-c2"};
-        g.doMove(operands3);
     }
 
     @Test

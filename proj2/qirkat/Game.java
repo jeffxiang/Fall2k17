@@ -65,13 +65,20 @@ class Game {
             }
 
             while (_state != SETUP && !_board.gameOver()) {
-                currplayer.myMove();
+
+                Command cmnd;
+                if (currplayer == white) {
+                    cmnd = getMoveCmnd("White: ");
+                } else {
+                    cmnd = getMoveCmnd("Black: ");
+                }
 
                 if (_state == PLAYING) {
+                    this.doMove(cmnd.operands());
                     if (_board.whoseMove() == WHITE) {
-                        currplayer = black;
-                    } else {
                         currplayer = white;
+                    } else {
+                        currplayer = black;
                     }
                 }
             }
@@ -189,7 +196,7 @@ class Game {
     void doLoad(String[] operands) {
         try {
             FileReader reader = new FileReader(
-                    "../proj2/testing/" + operands[0]);
+                    "../proj2/qirkat/" + operands[0]);
             ReaderSource source = new ReaderSource(reader, false);
             _inputs.addSource(source);
             process();
@@ -253,6 +260,7 @@ class Game {
     /** Perform the command 'clear'. */
     void doClear(String[] unused) {
         _state = SETUP;
+        _board = new Board();
         _blackIsManual = true;
         _whiteIsManual = true;
     }

@@ -152,9 +152,14 @@ class Board extends Observable {
         char fromrow = mov.row0();
         char tocol = mov.col1();
         char torow = mov.row1();
+        int fromindex = mov.fromIndex();
+        int toindex = mov.toIndex();
         PieceColor frompiece = _board[index(fromcol, fromrow)];
         PieceColor topiece = _board[index(tocol, torow)];
         if (frompiece != whoseMove() || topiece.isPiece()) {
+            return false;
+        }
+        if (!isRadiatingSpot(fromindex) && !isRadiatingSpot(toindex)) {
             return false;
         }
         if (frompiece == WHITE) {
@@ -416,28 +421,31 @@ class Board extends Observable {
 
     /** Make the Move MOV on this Board, assuming it is legal. */
     void makeMove(Move mov) {
-        assert legalMove(mov);
-        _prevboards.add(new Board(this));
-        while (mov != null) {
-            char fromcol = mov.col0();
-            char fromrow = mov.row0();
-            char tocol = mov.col1();
-            char torow = mov.row1();
-            int fromindex = index(fromcol, fromrow);
-            int toindex = index(tocol, torow);
-            int jumpedindex = mov.jumpedIndex();
-            this.set(fromindex, EMPTY);
-            _previndices[fromindex] = -1;
-            this.set(jumpedindex, EMPTY);
-            _previndices[jumpedindex] = -1;
-            this.set(toindex, _whoseMove);
-            _previndices[toindex] = fromindex;
-            mov = mov.jumpTail();
-        }
-        _whoseMove = _whoseMove.opposite();
+        if (legalMove(mov)) {
+            _prevboards.add(new Board(this));
+            while (mov != null) {
+                char fromcol = mov.col0();
+                char fromrow = mov.row0();
+                char tocol = mov.col1();
+                char torow = mov.row1();
+                int fromindex = index(fromcol, fromrow);
+                int toindex = index(tocol, torow);
+                int jumpedindex = mov.jumpedIndex();
+                this.set(fromindex, EMPTY);
+                _previndices[fromindex] = -1;
+                this.set(jumpedindex, EMPTY);
+                _previndices[jumpedindex] = -1;
+                this.set(toindex, _whoseMove);
+                _previndices[toindex] = fromindex;
+                mov = mov.jumpTail();
+            }
+            _whoseMove = _whoseMove.opposite();
 
-        setChanged();
-        notifyObservers();
+            setChanged();
+            notifyObservers();
+        } else {
+            throw new AssertionError();
+        }
     }
 
     /** Undo the last move, if any. */
