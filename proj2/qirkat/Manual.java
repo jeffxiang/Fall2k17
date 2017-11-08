@@ -26,6 +26,12 @@ class Manual extends Player {
         return null;
     }
 
+    @Override
+    /** Returns true because I am manual. */
+    boolean isManual() {
+        return true;
+    }
+
     /** Identifies the player serving as a source of input commands. */
     private String _prompt;
 }

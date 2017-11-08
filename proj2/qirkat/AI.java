@@ -1,5 +1,7 @@
 package qirkat;
 
+import java.util.ArrayList;
+
 import static qirkat.PieceColor.*;
 
 /** A Player that computes its own moves.
@@ -25,15 +27,19 @@ class AI extends Player {
         Main.startTiming();
         Move move = findMove();
         Main.endTiming();
-
-        // FIXME
         return move;
+    }
+
+    @Override
+    /** Returns false because I am not manual. */
+    boolean isManual() {
+        return false;
     }
 
     /** Return a move for me from the current position, assuming there
      *  is a move. */
-    private Move findMove() {
-        Board b = new Board(board());
+    Move findMove() {
+        Board b = new Board(this.board());
         if (myColor() == WHITE) {
             findMove(b, MAX_DEPTH, true, 1, -INFTY, INFTY);
         } else {
@@ -57,17 +63,55 @@ class AI extends Player {
         Move best;
         best = null;
 
-        // FIXME
+        if (depth == 0 || board.gameOver()) {
+            return staticScore(board);
+        }
+        int maxsofar = -INFTY;
+        int minsofar = INFTY;
+        for (Move m: board.getMoves()) {
+
+            Board copy = new Board(board);
+
+            copy.makeMove(m);
+            if (sense == 1) {
+                if (staticScore(copy) >= maxsofar) {
+                    best = m;
+                    maxsofar = staticScore(copy);
+                    alpha = Integer.max(alpha, staticScore(copy));
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+            } else if (sense == -1) {
+                if (staticScore(copy) <= minsofar) {
+                    best = m;
+                    minsofar = staticScore(copy);
+                    beta = Integer.min(beta, staticScore(copy));
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+            }
+            findMove(copy, depth - 1, saveMove, sense, alpha, beta);
+        }
 
         if (saveMove) {
             _lastFoundMove = best;
+            if (!board().legalMove(_lastFoundMove)) {
+                ArrayList<Move> moves = board().getMoves();
+                int index = 0;
+                if (moves.size() != 1) {
+                    index = game().nextRandom(moves.size() - 1);
+                }
+                _lastFoundMove = moves.get(index);
+            }
         }
 
-        return 0; // FIXME
+        return maxsofar;
     }
 
     /** Return a heuristic value for BOARD. */
-    private int staticScore(Board board) {
+    int staticScore(Board board) {
         int whitecount = 0;
         int blackcount = 0;
         String boardstring = board.toString();
@@ -78,11 +122,12 @@ class AI extends Player {
                 blackcount++;
             }
         }
-        if (this.myColor() == WHITE) {
-            return whitecount - blackcount;
-        } else if (this.myColor() == BLACK) {
-            return blackcount - whitecount;
+        if (whitecount == 0) {
+            return -INFTY;
         }
-        return -1;
+        if (blackcount == 0) {
+            return INFTY;
+        }
+        return whitecount - blackcount;
     }
 }

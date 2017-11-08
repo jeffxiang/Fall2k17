@@ -114,6 +114,9 @@ class Board extends Observable {
     /** Return true iff the game is over: i.e., if the current player has
      *  no moves. */
     boolean gameOver() {
+        if (getMoves().size() == 0) {
+            _gameOver = true;
+        }
         return _gameOver;
     }
 
@@ -187,9 +190,6 @@ class Board extends Observable {
 
     /** Add all legal moves from the current position to MOVES. */
     void getMoves(ArrayList<Move> moves) {
-        if (gameOver()) {
-            return;
-        }
         if (jumpPossible()) {
             for (int k = 0; k <= MAX_INDEX; k += 1) {
                 getJumps(moves, k);

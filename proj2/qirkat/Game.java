@@ -38,15 +38,12 @@ class Game {
     /** Run a session of Qirkat gaming. */
     void process() {
         Player white, black;
-
         white = black = null;
         doClear(null);
-
         while (true) {
             while (_state == SETUP) {
                 doCommand();
             }
-
             if (_whiteIsManual) {
                 white = new Manual(this, PieceColor.WHITE);
             } else {
@@ -63,18 +60,23 @@ class Game {
             } else {
                 currplayer = black;
             }
-
             while (_state != SETUP && !_board.gameOver()) {
-
-                Command cmnd;
+                Command cmnd = null;
                 if (currplayer == white) {
-                    cmnd = getMoveCmnd("White: ");
+                    if (_whiteIsManual) {
+                        cmnd = getMoveCmnd("White: ");
+                    }
                 } else {
-                    cmnd = getMoveCmnd("Black: ");
+                    if (_blackIsManual) {
+                        cmnd = getMoveCmnd("Black: ");
+                    }
                 }
-
                 if (_state == PLAYING) {
-                    this.doMove(cmnd.operands());
+                    if (currplayer.isManual()) {
+                        this.doMove(cmnd.operands());
+                    } else {
+                        this.doMove(currplayer.myMove());
+                    }
                     if (_board.whoseMove() == WHITE) {
                         currplayer = white;
                     } else {
@@ -82,14 +84,11 @@ class Game {
                     }
                 }
             }
-
             if (_state == PLAYING) {
                 reportWinner();
             }
-
             _state = SETUP;
         }
-
     }
 
     /** Return a read-only view of my game board. */
@@ -243,11 +242,12 @@ class Game {
             Move move = Move.parseMove(expr);
             String whomoved = _board.whoseMove().toString();
             _board.makeMove(move);
-            if (_board.whoseMove() == PieceColor.WHITE) {
+            _constBoard = _board;
+            if (_board.whoseMove() != PieceColor.WHITE) {
                 if (!_whiteIsManual) {
                     reportMove(whomoved + " moves " + move.toString() + ".");
                 }
-            } else if (_board.whoseMove() == PieceColor.BLACK) {
+            } else if (_board.whoseMove() != PieceColor.BLACK) {
                 if (!_blackIsManual) {
                     reportMove(whomoved + " moves " + move.toString() + ".");
                 }
@@ -257,11 +257,19 @@ class Game {
         }
     }
 
+    /** Performs move m.
+     * @param m Move */
+    void doMove(Move m) {
+        String[] operands = new String[1];
+        operands[0] = m.toString();
+        doMove(operands);
+    }
+
     /** Perform the command 'clear'. */
     void doClear(String[] unused) {
         _state = SETUP;
         _board = new Board();
-        _blackIsManual = true;
+        _blackIsManual = false;
         _whiteIsManual = true;
     }
 
@@ -275,6 +283,8 @@ class Game {
     /** Perform the command 'set OPERANDS[0] OPERANDS[1]'. */
     void doSet(String[] operands) {
         _state = SETUP;
+        _blackIsManual = true;
+        _whiteIsManual = true;
         String playerturn = removeWhitespace(operands[0]);
         playerturn = playerturn.replaceAll("w", "W");
         playerturn = playerturn.replaceAll("b", "B");
@@ -328,7 +338,17 @@ class Game {
     /** Report the outcome of the current game. */
     void reportWinner() {
         String msg;
-        msg = "Game over."; // FIXME
+        String winner = null;
+        if (_board.whoseMove() == WHITE) {
+            if (_board.getMoves().size() == 0) {
+                winner = "Black";
+            }
+        } else if (_board.whoseMove() == BLACK) {
+            if (_board.getMoves().size() == 0) {
+                winner = "White";
+            }
+        }
+        msg = winner + " wins.";
         _reporter.outcomeMsg(msg);
     }
 

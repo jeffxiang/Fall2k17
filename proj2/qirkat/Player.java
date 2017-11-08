@@ -11,6 +11,9 @@ abstract class Player {
         _myColor = myColor;
     }
 
+    /** Returns true iff player is manual. */
+    abstract boolean isManual();
+
     /** Return my pieces' color. */
     PieceColor myColor() {
         return _myColor;
@@ -25,7 +28,6 @@ abstract class Player {
     Board board() {
         return _game.board();
     }
-
 
     /** Return a legal move for me. Assumes that
      *  board.whoseMove() == myColor and that !board.gameOver(). */
