@@ -36,8 +36,6 @@ public class Main {
         game = null;
         if (useGUI) {
             try {
-                // Remove this comment.  Also remove the next two lines if
-                // you do the extra credit.
                 System.err.printf("Sorry, --display not implemented.%n");
                 System.exit(2);
 

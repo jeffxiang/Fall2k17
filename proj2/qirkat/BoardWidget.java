@@ -84,7 +84,6 @@ class BoardWidget extends Pad implements Observer {
     public synchronized void update(Observable model, Object arg) {
         repaint();
     }
-        // FIXME
 
 
     /** Dimension of current drawing surface in pixels. */

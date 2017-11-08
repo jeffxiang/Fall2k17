@@ -46,7 +46,6 @@ public class MoreBoardTests {
         return sb.toString();
     }
 
-    // create a new board with the initial state.
     private Board getBoard() {
         Board b = new Board();
         b.setPieces(getInitialRepresentation(), currMove);
