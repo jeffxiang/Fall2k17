@@ -115,14 +115,15 @@ class GUI extends TopLevel implements Observer, Reporter {
 
     @Override
     public void moveMsg(String format, Object... args) {
+        // FIXME
     }
 
     @Override
     public void update(Observable obs, Object arg) {
         if (obs == _model) {
-            // FIXME (if needed)
+            // FIXME
         } else if (obs == _widget) {
-            // FIXME (if needed)
+            // FIXME
         }
     }
 

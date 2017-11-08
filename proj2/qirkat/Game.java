@@ -339,14 +339,8 @@ class Game {
     void reportWinner() {
         String msg;
         String winner = null;
-        if (_board.whoseMove() == WHITE) {
-            if (_board.getMoves().size() == 0) {
-                winner = "Black";
-            }
-        } else if (_board.whoseMove() == BLACK) {
-            if (_board.getMoves().size() == 0) {
-                winner = "White";
-            }
+        if (_board.gameOver()) {
+            winner = _board.whoWon();
         }
         msg = winner + " wins.";
         _reporter.outcomeMsg(msg);

@@ -1,11 +1,10 @@
 package qirkat;
 
-import java.util.ArrayList;
-
 import static qirkat.PieceColor.*;
 
 /** A Player that computes its own moves.
  *  @author Jeff Xiang
+ *  with pseudocode for findMove from Wikipedia: Alpha-Beta Pruning.
  */
 class AI extends Player {
 
@@ -60,54 +59,45 @@ class AI extends Player {
      *  of the board value and does not set _lastMoveFound. */
     private int findMove(Board board, int depth, boolean saveMove, int sense,
                          int alpha, int beta) {
-        Move best;
-        best = null;
+        int v;
 
         if (depth == 0 || board.gameOver()) {
             return staticScore(board);
         }
-        int maxsofar = -INFTY;
-        int minsofar = INFTY;
-        for (Move m: board.getMoves()) {
-
-            Board copy = new Board(board);
-
-            copy.makeMove(m);
-            if (sense == 1) {
-                if (staticScore(copy) >= maxsofar) {
-                    best = m;
-                    maxsofar = staticScore(copy);
-                    alpha = Integer.max(alpha, staticScore(copy));
-                    if (beta <= alpha) {
-                        break;
-                    }
+        if (sense == 1) {
+            v = -INFTY;
+            for (Move m: board.getMoves()) {
+                Board copy = new Board(board);
+                copy.makeMove(m);
+                int p = findMove(copy, depth - 1, false, -1, alpha, beta);
+                if (saveMove && p > v) {
+                    _lastFoundMove = m;
                 }
-            } else if (sense == -1) {
-                if (staticScore(copy) <= minsofar) {
-                    best = m;
-                    minsofar = staticScore(copy);
-                    beta = Integer.min(beta, staticScore(copy));
-                    if (beta <= alpha) {
-                        break;
-                    }
+                v = Integer.max(v, p);
+                alpha = Integer.max(alpha, v);
+                if (beta <= alpha) {
+                    break;
                 }
+                return v;
             }
-            findMove(copy, depth - 1, saveMove, sense, alpha, beta);
-        }
-
-        if (saveMove) {
-            _lastFoundMove = best;
-            if (!board().legalMove(_lastFoundMove)) {
-                ArrayList<Move> moves = board().getMoves();
-                int index = 0;
-                if (moves.size() != 1) {
-                    index = game().nextRandom(moves.size() - 1);
+        } else if (sense == -1) {
+            v = INFTY;
+            for (Move m: board.getMoves()) {
+                Board copy = new Board(board);
+                copy.makeMove(m);
+                int p = findMove(copy, depth - 1, false, 1, alpha, beta);
+                if (saveMove && p < v) {
+                    _lastFoundMove = m;
                 }
-                _lastFoundMove = moves.get(index);
+                v = Integer.min(v, p);
+                beta = Integer.min(beta, v);
+                if (beta >= alpha) {
+                    break;
+                }
+                return v;
             }
         }
-
-        return maxsofar;
+        return 0;
     }
 
     /** Return a heuristic value for BOARD. */

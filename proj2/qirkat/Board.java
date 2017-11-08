@@ -106,6 +106,9 @@ class Board extends Observable {
         for (int i = 0; i < _previndices.length; i++) {
             _previndices[i] = -1;
         }
+        if (gameOver()) {
+            _gameOver = true;
+        }
 
         setChanged();
         notifyObservers();
@@ -114,10 +117,41 @@ class Board extends Observable {
     /** Return true iff the game is over: i.e., if the current player has
      *  no moves. */
     boolean gameOver() {
-        if (getMoves().size() == 0) {
+        int whitecount = 0;
+        int blackcount = 0;
+        String boardstring = this.toString();
+        for (int i = 0; i < boardstring.length(); i++) {
+            if (boardstring.charAt(i) == 'w') {
+                whitecount++;
+            } else if (boardstring.charAt(i) == 'b') {
+                blackcount++;
+            }
+        }
+        if (whitecount == 0 || blackcount == 0) {
             _gameOver = true;
         }
         return _gameOver;
+    }
+
+    /** Return string of winner. */
+    String whoWon() {
+        int whitecount = 0;
+        int blackcount = 0;
+        String boardstring = this.toString();
+        for (int i = 0; i < boardstring.length(); i++) {
+            if (boardstring.charAt(i) == 'w') {
+                whitecount++;
+            } else if (boardstring.charAt(i) == 'b') {
+                blackcount++;
+            }
+        }
+        if (whitecount == 0) {
+            return "Black";
+        }
+        if (blackcount == 0) {
+            return "White";
+        }
+        return "";
     }
 
     /** Return the current contents of square C R, where 'a' <= C <= 'e',
@@ -194,10 +228,9 @@ class Board extends Observable {
             for (int k = 0; k <= MAX_INDEX; k += 1) {
                 getJumps(moves, k);
             }
-        } else {
-            for (int k = 0; k <= MAX_INDEX; k += 1) {
-                getMoves(moves, k);
-            }
+        }
+        for (int k = 0; k <= MAX_INDEX; k += 1) {
+            getMoves(moves, k);
         }
     }
 

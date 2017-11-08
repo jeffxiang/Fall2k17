@@ -1,6 +1,7 @@
 package qirkat;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 public class AITest {
@@ -45,8 +46,12 @@ public class AITest {
         AI ai3 = new AI(g3, PieceColor.WHITE);
         b3.makeMove(Move.parseMove("d2-e2"));
         b3.makeMove(Move.parseMove("e5-e4"));
-        Move move = ai3.findMove();
-        b3.makeMove(move);
+        Board b4 = new Board();
+        CommandSources c4 = new CommandSources();
+        TextReporter t4 = new TextReporter();
+        Game g4 = new Game(b4, c4, t4);
+        AI ai4 = new AI(g4, PieceColor.WHITE);
+        b4.makeMove(ai4.findMove());
     }
 
 }
