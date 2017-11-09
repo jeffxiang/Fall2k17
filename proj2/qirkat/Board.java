@@ -65,7 +65,12 @@ class Board extends Observable {
         for (int i = 0; i < _board.length; i++) {
             _board[i] = b._board[i];
         }
-        _prevboards = b._prevboards;
+        for (int i = 0; i < _prevboards.size(); i++) {
+            _prevboards.add(i, b._prevboards.get(i));
+        }
+        for (int i = 0; i < _previndices.length; i++) {
+            _previndices[i] = b._previndices[i];
+        }
         _whoseMove = b._whoseMove;
         _gameOver = b._gameOver;
     }

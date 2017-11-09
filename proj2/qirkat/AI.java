@@ -78,8 +78,8 @@ class AI extends Player {
                 if (beta <= alpha) {
                     break;
                 }
-                return v;
             }
+            return v;
         } else if (sense == -1) {
             v = INFTY;
             for (Move m: board.getMoves()) {
@@ -94,8 +94,8 @@ class AI extends Player {
                 if (beta >= alpha) {
                     break;
                 }
-                return v;
             }
+            return v;
         }
         return 0;
     }
