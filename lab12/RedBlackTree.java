@@ -33,7 +33,6 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return root of the Red-Black tree for given 2-3-4 tree.
      */
     RBTreeNode<T> buildRedBlackTree(BTree.Node<T> r) {
-        // YOUR CODE HERE
         return null;
     }
 
@@ -109,8 +108,8 @@ public class RedBlackTree<T extends Comparable<T>> {
 
         // Insert (return) new red leaf node.
         if (node == null) {
-            // YOUR CODE HERE
-
+            root = new RBTreeNode(false, item);
+            return root;
         }
 
         // Handle normal binary search tree insertion.

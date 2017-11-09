@@ -127,7 +127,14 @@ class Board extends Observable {
                 blackcount++;
             }
         }
-        if (whitecount == 0 || blackcount == 0) {
+        Board whitemoveboard = new Board(this);
+        whitemoveboard._whoseMove = WHITE;
+        ArrayList<Move> whitemoves = whitemoveboard.getMoves();
+        Board blackmoveboard = new Board(this);
+        blackmoveboard._whoseMove = BLACK;
+        ArrayList<Move> blackmoves = blackmoveboard.getMoves();
+        if (whitecount == 0 || blackcount == 0 ||
+                whitemoves.size() == 0 || blackmoves.size() == 0) {
             _gameOver = true;
         }
         return _gameOver;
@@ -145,10 +152,16 @@ class Board extends Observable {
                 blackcount++;
             }
         }
-        if (whitecount == 0) {
+        Board whitemoveboard = new Board(this);
+        whitemoveboard._whoseMove = WHITE;
+        ArrayList<Move> whitemoves = whitemoveboard.getMoves();
+        Board blackmoveboard = new Board(this);
+        blackmoveboard._whoseMove = BLACK;
+        ArrayList<Move> blackmoves = blackmoveboard.getMoves();
+        if (whitecount == 0 || whitemoves.size() == 0) {
             return "Black";
         }
-        if (blackcount == 0) {
+        if (blackcount == 0 || blackmoves.size() == 0) {
             return "White";
         }
         return "";
@@ -200,12 +213,12 @@ class Board extends Observable {
             return false;
         }
         if (frompiece == WHITE) {
-            if (torow < fromrow) {
+            if (torow < fromrow || (fromrow == '5' && torow == '5')) {
                 return false;
             }
         }
         if (frompiece == BLACK) {
-            if (torow > fromrow) {
+            if (torow > fromrow || (fromrow == '1' && torow == '1')) {
                 return false;
             }
         }
