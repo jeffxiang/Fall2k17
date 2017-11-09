@@ -38,7 +38,6 @@ class Game {
     /** Run a session of Qirkat gaming. */
     void process() {
         Player white, black;
-        white = black = null;
         doClear(null);
         while (true) {
             while (_state == SETUP) {
@@ -75,20 +74,11 @@ class Game {
                     Move move;
                     String whomoved = _board.whoseMove().toString();
                     if (currplayer.isManual()) {
-                        move = Move.parseMove(cmnd.operands()[0]);
                         this.doMove(cmnd.operands());
                     } else {
                         move = currplayer.myMove();
                         this.doMove(move);
-                    }
-                    if (_board.whoseMove() != PieceColor.WHITE) {
-                        if (!_whiteIsManual) {
-                            reportMove(whomoved + " moves " + move.toString() + ".");
-                        }
-                    } else if (_board.whoseMove() != PieceColor.BLACK) {
-                        if (!_blackIsManual) {
-                            reportMove(whomoved + " moves " + move.toString() + ".");
-                        }
+                        reportMove(whomoved + "moves " + move.toString() + ".");
                     }
                     if (_board.whoseMove() == WHITE) {
                         currplayer = white;

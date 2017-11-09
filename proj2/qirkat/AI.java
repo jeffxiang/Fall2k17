@@ -72,7 +72,7 @@ class AI extends Player {
             for (Move m: board.getMoves()) {
                 board.makeMove(m);
                 int p = findMove(board, depth - 1, false, -1, alpha, beta);
-                if (saveMove && p > v) {
+                if (saveMove && p >= v) {
                     _lastFoundMove = m;
                 }
                 v = Integer.max(v, p);
@@ -88,7 +88,7 @@ class AI extends Player {
             for (Move m: board.getMoves()) {
                 board.makeMove(m);
                 int p = findMove(board, depth - 1, false, 1, alpha, beta);
-                if (saveMove && p < v) {
+                if (saveMove && p <= v) {
                     _lastFoundMove = m;
                 }
                 v = Integer.min(v, p);

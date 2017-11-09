@@ -136,8 +136,8 @@ class Board extends Observable {
         Board blackmoveboard = new Board(this);
         blackmoveboard._whoseMove = BLACK;
         ArrayList<Move> blackmoves = blackmoveboard.getMoves();
-        if (whitecount == 0 || blackcount == 0 ||
-                whitemoves.size() == 0 || blackmoves.size() == 0) {
+        if (whitecount == 0 || blackcount == 0
+                || whitemoves.size() == 0 || blackmoves.size() == 0) {
             _gameOver = true;
         }
         return _gameOver;
