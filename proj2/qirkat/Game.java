@@ -78,7 +78,7 @@ class Game {
                     } else {
                         move = currplayer.myMove();
                         this.doMove(move);
-                        reportMove(whomoved + "moves " + move.toString() + ".");
+                        reportMove(whomoved + " moves " + move.toString() + ".");
                     }
                     if (_board.whoseMove() == WHITE) {
                         currplayer = white;
