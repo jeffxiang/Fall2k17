@@ -1,3 +1,5 @@
+# Check that we recognize a won position
+java -ea qirkat.Main
 c2-c3
 c4-c2
 c1-c3
@@ -57,3 +59,14 @@ b3-b2
 e1-e2
 b2-c1
 e3-d3
+dump
+@<===
+@< - - - - w
+@< - - - - w
+@< - - - w -
+@< - - - - w
+@< b - b - -
+@<===
+auto White
+start
+@<White wins.

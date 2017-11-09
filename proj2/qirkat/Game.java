@@ -72,10 +72,23 @@ class Game {
                     }
                 }
                 if (_state == PLAYING) {
+                    Move move;
+                    String whomoved = _board.whoseMove().toString();
                     if (currplayer.isManual()) {
+                        move = Move.parseMove(cmnd.operands()[0]);
                         this.doMove(cmnd.operands());
                     } else {
-                        this.doMove(currplayer.myMove());
+                        move = currplayer.myMove();
+                        this.doMove(move);
+                    }
+                    if (_board.whoseMove() != PieceColor.WHITE) {
+                        if (!_whiteIsManual) {
+                            reportMove(whomoved + " moves " + move.toString() + ".");
+                        }
+                    } else if (_board.whoseMove() != PieceColor.BLACK) {
+                        if (!_blackIsManual) {
+                            reportMove(whomoved + " moves " + move.toString() + ".");
+                        }
                     }
                     if (_board.whoseMove() == WHITE) {
                         currplayer = white;
@@ -240,18 +253,8 @@ class Game {
         try {
             String expr = removeWhitespace(operands[0]);
             Move move = Move.parseMove(expr);
-            String whomoved = _board.whoseMove().toString();
             _board.makeMove(move);
             _constBoard = _board;
-            if (_board.whoseMove() != PieceColor.WHITE) {
-                if (!_whiteIsManual) {
-                    reportMove(whomoved + " moves " + move.toString() + ".");
-                }
-            } else if (_board.whoseMove() != PieceColor.BLACK) {
-                if (!_blackIsManual) {
-                    reportMove(whomoved + " moves " + move.toString() + ".");
-                }
-            }
         } catch (AssertionError excp) {
             reportError("Illegal move. Request another move.");
         }

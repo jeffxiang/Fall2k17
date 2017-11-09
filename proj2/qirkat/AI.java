@@ -25,6 +25,9 @@ class AI extends Player {
     Move myMove() {
         Main.startTiming();
         Move move = findMove();
+        if (!board().legalMove(move)) {
+            System.out.println(move.toString());
+        }
         Main.endTiming();
         return move;
     }
@@ -67,14 +70,14 @@ class AI extends Player {
         if (sense == 1) {
             v = -INFTY;
             for (Move m: board.getMoves()) {
-                Board copy = new Board(board);
-                copy.makeMove(m);
-                int p = findMove(copy, depth - 1, false, -1, alpha, beta);
+                board.makeMove(m);
+                int p = findMove(board, depth - 1, false, -1, alpha, beta);
                 if (saveMove && p > v) {
                     _lastFoundMove = m;
                 }
                 v = Integer.max(v, p);
                 alpha = Integer.max(alpha, v);
+                board.undo();
                 if (beta <= alpha) {
                     break;
                 }
@@ -83,14 +86,14 @@ class AI extends Player {
         } else if (sense == -1) {
             v = INFTY;
             for (Move m: board.getMoves()) {
-                Board copy = new Board(board);
-                copy.makeMove(m);
-                int p = findMove(copy, depth - 1, false, 1, alpha, beta);
+                board.makeMove(m);
+                int p = findMove(board, depth - 1, false, 1, alpha, beta);
                 if (saveMove && p < v) {
                     _lastFoundMove = m;
                 }
                 v = Integer.min(v, p);
                 beta = Integer.min(beta, v);
+                board.undo();
                 if (beta >= alpha) {
                     break;
                 }
