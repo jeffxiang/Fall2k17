@@ -25,9 +25,6 @@ class AI extends Player {
     Move myMove() {
         Main.startTiming();
         Move move = findMove();
-        if (!board().legalMove(move)) {
-            System.out.println(move.toString());
-        }
         Main.endTiming();
         return move;
     }
@@ -41,11 +38,11 @@ class AI extends Player {
     /** Return a move for me from the current position, assuming there
      *  is a move. */
     Move findMove() {
-        Board b = new Board(this.board());
+        Board myboard = new Board(this.board());
         if (myColor() == WHITE) {
-            findMove(b, MAX_DEPTH, true, 1, -INFTY, INFTY);
+            findMove(myboard, MAX_DEPTH, true, 1, -INFTY, INFTY);
         } else {
-            findMove(b, MAX_DEPTH, true, -1, -INFTY, INFTY);
+            findMove(myboard, MAX_DEPTH, true, -1, -INFTY, INFTY);
         }
         return _lastFoundMove;
     }
@@ -107,6 +104,8 @@ class AI extends Player {
     int staticScore(Board board) {
         int whitecount = 0;
         int blackcount = 0;
+        int bottomwhitecount = 0;
+        int topblackcount = 0;
         String boardstring = board.toString();
         for (int i = 0; i < boardstring.length(); i++) {
             if (boardstring.charAt(i) == 'w') {
@@ -115,12 +114,26 @@ class AI extends Player {
                 blackcount++;
             }
         }
+        int length = Move.SIDE * Move.SIDE;
+        for (int i = 0; i < length; i++) {
+            if (i < 5) {
+                PieceColor bottomrowpiece = board.get(i);
+                if (bottomrowpiece == WHITE) {
+                    bottomwhitecount++;
+                }
+            } else if (i >= length - 5) {
+                PieceColor toprowpiece = board.get(i);
+                if (toprowpiece == BLACK) {
+                    topblackcount++;
+                }
+            }
+        }
         if (whitecount == 0) {
             return -INFTY;
         }
         if (blackcount == 0) {
             return INFTY;
         }
-        return whitecount - blackcount;
+        return whitecount - blackcount + bottomwhitecount - topblackcount;
     }
 }

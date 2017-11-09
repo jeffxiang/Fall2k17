@@ -31,7 +31,7 @@ class Board extends Observable {
     /** A copy of B. */
     Board(Board b) {
         _board = new PieceColor[Move.SIDE * Move.SIDE];
-        _whoseMove = b.whoseMove();
+        _whoseMove = b._whoseMove;
         internalCopy(b);
     }
 
@@ -39,6 +39,11 @@ class Board extends Observable {
      *  method that modifies it). */
     Board constantView() {
         return this.new ConstantBoard();
+    }
+
+    /** Return my board list. */
+    PieceColor[] getBoardList() {
+        return _board;
     }
 
     /** Clear me to my starting state, with pieces in their initial

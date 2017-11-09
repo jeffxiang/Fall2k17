@@ -78,7 +78,8 @@ class Game {
                     } else {
                         move = currplayer.myMove();
                         this.doMove(move);
-                        reportMove(whomoved + " moves " + move.toString() + ".");
+                        reportMove(whomoved + " moves "
+                                + move.toString() + ".");
                     }
                     if (_board.whoseMove() == WHITE) {
                         currplayer = white;
@@ -96,6 +97,7 @@ class Game {
 
     /** Return a read-only view of my game board. */
     Board board() {
+        _constBoard = _board.constantView();
         return _constBoard;
     }
 

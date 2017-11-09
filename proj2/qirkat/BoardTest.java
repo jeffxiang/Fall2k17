@@ -255,4 +255,11 @@ public class BoardTest {
         b.setPieces("bbb-- bwb-- bbb-- ----- -----", PieceColor.WHITE);
         assertTrue(b.isMove());
     }
+
+    @Test
+    public void testconstantboard() {
+        Board b = new Board();
+        b.setPieces("wwwww wwwww bb-ww wwwww wwwww", PieceColor.BLACK);
+        Board b2 = b.constantView();
+    }
 }
