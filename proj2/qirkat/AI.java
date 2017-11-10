@@ -67,6 +67,12 @@ class AI extends Player {
         if (depth == 0 || board.gameOver()) {
             return staticScore(board);
         }
+        if (board.getMoves().isEmpty() && board.whoseMove() == WHITE) {
+            return -INFTY;
+        }
+        if (board.getMoves().isEmpty() && board.whoseMove() == BLACK) {
+            return INFTY;
+        }
         for (Move m: board.getMoves()) {
             board.makeMove(m);
             if (sense == 1) {
