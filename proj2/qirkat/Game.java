@@ -199,7 +199,7 @@ class Game {
     /** Perform the command 'load OPERANDS[0]'. */
     void doLoad(String[] operands) {
         try {
-            FileReader reader = new FileReader("../" + operands[0]);
+            FileReader reader = new FileReader(operands[0]);
             ReaderSource source = new ReaderSource(reader, false);
             _inputs.addSource(source);
             process();

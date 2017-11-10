@@ -125,10 +125,10 @@ class AI extends Player {
                 }
             }
         }
-        if (whitecount == 0) {
+        if (whitecount == 0 || board.whoWon().equals("Black")) {
             return -INFTY;
         }
-        if (blackcount == 0) {
+        if (blackcount == 0 || board.whoWon().equals("White")) {
             return INFTY;
         }
         return whitecount - blackcount + bottomwhitecount - topblackcount;
