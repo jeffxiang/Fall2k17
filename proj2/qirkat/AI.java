@@ -60,44 +60,41 @@ class AI extends Player {
     private int findMove(Board board, int depth, boolean saveMove, int sense,
                          int alpha, int beta) {
         int v;
+        Move best;
+        best = null;
+        int b = INFTY * -sense;
 
         if (depth == 0 || board.gameOver()) {
             return staticScore(board);
         }
-        if (sense == 1) {
-            v = -INFTY;
-            for (Move m: board.getMoves()) {
-                board.makeMove(m);
-                int p = findMove(board, depth - 1, false, -1, alpha, beta);
-                if (saveMove && p >= v) {
-                    _lastFoundMove = m;
+        for (Move m: board.getMoves()) {
+            board.makeMove(m);
+            if (sense == 1) {
+                v = findMove(board, depth - 1, false, -1, alpha, beta);
+                if (v >= alpha) {
+                    best = m;
+                    alpha = Math.max(alpha, v);
                 }
-                v = Integer.max(v, p);
-                alpha = Integer.max(alpha, v);
                 board.undo();
                 if (beta <= alpha) {
                     break;
                 }
-            }
-            return v;
-        } else if (sense == -1) {
-            v = INFTY;
-            for (Move m: board.getMoves()) {
-                board.makeMove(m);
-                int p = findMove(board, depth - 1, false, 1, alpha, beta);
-                if (saveMove && p <= v) {
-                    _lastFoundMove = m;
+            } else if (sense == -1) {
+                v = findMove(board, depth - 1, false, 1, alpha, beta);
+                if (v <= alpha) {
+                    best = m;
+                    beta = Math.min(beta, v);
                 }
-                v = Integer.min(v, p);
-                beta = Integer.min(beta, v);
                 board.undo();
                 if (beta >= alpha) {
                     break;
                 }
             }
-            return v;
         }
-        return 0;
+        if (saveMove) {
+            _lastFoundMove = best;
+        }
+        return b;
     }
 
     /** Return a heuristic value for BOARD. */
