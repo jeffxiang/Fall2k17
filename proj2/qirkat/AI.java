@@ -81,7 +81,7 @@ class AI extends Player {
                 }
             } else if (sense == -1) {
                 v = findMove(board, depth - 1, false, 1, alpha, beta);
-                if (v <= alpha) {
+                if (v <= beta) {
                     best = m;
                     beta = Math.min(beta, v);
                 }
