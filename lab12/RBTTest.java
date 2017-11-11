@@ -25,5 +25,6 @@ public class RBTTest {
         rbtesttree2.insert(6);
         rbtesttree2.insert(7);
         rbtesttree2.insert(8);
+        rbtesttree2.insert(5);
     }
 }
