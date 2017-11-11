@@ -68,12 +68,11 @@ public class RedBlackTree<T extends Comparable<T>> {
     RBTreeNode<T> rotateRight(RBTreeNode<T> node) {
         boolean nodeisblack = node.isBlack;
         node.isBlack = false;
-        root = node.left;
-        root.right = node;
-        root.right.right = node.right;
-        root.right.left = node.left.right;
-        root.isBlack = nodeisblack;
-        return root;
+        RBTreeNode y = node.left;
+        node.left = y.right;
+        y.right = node;
+        y.isBlack = nodeisblack;
+        return y;
     }
 
     /**
@@ -87,12 +86,12 @@ public class RedBlackTree<T extends Comparable<T>> {
     RBTreeNode<T> rotateLeft(RBTreeNode<T> node) {
         boolean nodeisblack = node.isBlack;
         node.isBlack = false;
-        root = node.right;
-        root.left = node;
-        root.left.left = node.left;
-        root.left.right = node.right.left;
-        root.isBlack = nodeisblack;
-        return root;
+        RBTreeNode y = node.right;
+        node.right = y.left;
+        y.left = node;
+        y.isBlack = nodeisblack;
+        node = y;
+        return node;
     }
 
     /**
@@ -158,12 +157,12 @@ public class RedBlackTree<T extends Comparable<T>> {
 
         // handle case C and "Right-leaning" situation.
         if (isRed(node.right) && !isRed(node.left)) {
-            rotateLeft(node);
+            node = rotateLeft(node);
         }
 
         // handle case B
         if (isRed(node.left) && isRed(node.left.left)) {
-            rotateRight(node);
+            node = rotateRight(node);
 
         }
 
@@ -172,7 +171,7 @@ public class RedBlackTree<T extends Comparable<T>> {
             flipColors(node);
             root.isBlack = true;
         }
-        return root;
+        return node;
     }
 
 
