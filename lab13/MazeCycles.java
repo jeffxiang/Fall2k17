@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Observable;
 /**
  *  @author Jeff Xiang
@@ -10,6 +11,9 @@ public class MazeCycles extends MazeExplorer {
     private int t;
     private boolean targetFound = false;
     private boolean cycleFound = false;
+    private int cyclestart;
+    private boolean atCycleStart = false;
+    private LinkedList<Integer> visited = new LinkedList<>();
 
     public MazeCycles(Maze m) {
         super(m);
@@ -21,15 +25,27 @@ public class MazeCycles extends MazeExplorer {
 
     @Override
     public void solve() {
-        printMaze();
         dfs(s, -1);
+        cycleRemoveEdges(s, cyclestart, visited);
     }
 
-    public void printMaze() {
-        for (int v = 0; v < t; v += 1) {
-            System.out.printf("%d\n", v);
-            for (int w : maze.adj(v)) {
-                System.out.printf("  %d\n", w);
+    public void cycleRemoveEdges(int v, int cyclestart, LinkedList<Integer> visited) {
+
+        if (v == cyclestart) {
+            atCycleStart = true;
+            return;
+        }
+
+        for (int w : maze.adj(v)) {
+            if (visited.peekFirst() == w && w != cyclestart) {
+                visited.removeFirst();
+                edgeTo[w] = w;
+                announce();
+                distTo[w] = distTo[v] + 1;
+                cycleRemoveEdges(w, cyclestart, visited);
+                if (atCycleStart) {
+                    return;
+                }
             }
         }
     }
@@ -45,24 +61,26 @@ public class MazeCycles extends MazeExplorer {
         if (targetFound) {
             return;
         }
-        System.out.printf("DFS Node: %d, Prev Node: %d\n", v, prev);
 
         for (int w : maze.adj(v)) {
             if (w == prev) continue;
-            System.out.printf("  Adjacent Node to (%d): %d\n", v, w);
              if (marked[w]) {
                 edgeTo[w] = v;
                 distTo[w] = distTo[v] + 1;
-                System.out.println("  Cycle Here");
                 announce();
                 cycleFound = true;
+                cyclestart = w;
                 return;
             } else {
                 edgeTo[w] = v;
                 announce();
+                visited.add(w);
                 distTo[w] = distTo[v] + 1;
                 dfs(w, v);
-                if (targetFound || cycleFound) {
+                if (targetFound) {
+                    return;
+                }
+                if (cycleFound) {
                     return;
                 }
             }
