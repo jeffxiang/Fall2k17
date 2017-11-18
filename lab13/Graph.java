@@ -85,16 +85,14 @@ public class Graph {
         while (!q.isEmpty()) {
             int mindistvertex = q.poll();
             for (int neighbor: neighbors(mindistvertex)) {
-                if (isAdjacent(mindistvertex, neighbor)) {
-                    Edge toneighbor = getEdge(mindistvertex, neighbor);
-                    if (toneighbor != null) {
-                        int altdist = vtodist.get(mindistvertex) + toneighbor.edgeWeight;
-                        if (altdist < vtodist.get(neighbor)) {
-                            vtodist.replace(neighbor, altdist);
-                            prev.replace(neighbor, altdist);
-                            result[i] = altdist;
-                            i++;
-                        }
+                Edge toneighbor = getEdge(mindistvertex, neighbor);
+                if (toneighbor != null) {
+                    int altdist = vtodist.get(mindistvertex) + toneighbor.edgeWeight;
+                    if (altdist < vtodist.get(neighbor)) {
+                        vtodist.replace(neighbor, altdist);
+                        prev.replace(neighbor, altdist);
+                        result[i] = altdist;
+                        i++;
                     }
                 }
             }
