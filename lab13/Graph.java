@@ -4,6 +4,7 @@ public class Graph {
 
     private LinkedList<Edge>[] adjLists;
     private int vertexCount;
+    private HashMap<Integer, Integer> vtodist = new HashMap<>();
 
     // Initialize a graph with the given number of vertices and no edges.
     @SuppressWarnings("unchecked")
@@ -65,13 +66,52 @@ public class Graph {
     // an integer array consisting of the shortest distances from 'startVertex'
     // to all other vertices.
     public int[] dijkstras(int startVertex) {
-        // TODO: Your code here!
-        return null;
+        int[] result = new int[vertexCount];
+        int i = 0;
+        HashMap<Integer, Integer> prev = new HashMap<>();
+        PriorityQueue<Integer> q = new PriorityQueue<>(new distComparator());
+        for (LinkedList<Edge> edges: adjLists) {
+            for (Edge edge: edges) {
+                vtodist.put(edge.to(), Integer.MAX_VALUE);
+                prev.put(edge.to(), null);
+                if (!q.contains(edge.to())) {
+                    q.add(edge.to());
+                }
+            }
+        }
+        vtodist.put(startVertex, 0);
+        q.remove(startVertex);
+        q.add(startVertex);
+        while (!q.isEmpty()) {
+            int mindistvertex = q.poll();
+            for (int neighbor: neighbors(mindistvertex)) {
+                if (isAdjacent(mindistvertex, neighbor)) {
+                    Edge toneighbor = getEdge(mindistvertex, neighbor);
+                    if (toneighbor != null) {
+                        int altdist = vtodist.get(mindistvertex) + toneighbor.edgeWeight;
+                        if (altdist < vtodist.get(neighbor)) {
+                            vtodist.replace(neighbor, altdist);
+                            prev.replace(neighbor, altdist);
+                            result[i] = altdist;
+                            i++;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     // Returns the Edge object corresponding to the listed vertices, v1 and v2.
     // You may find this helpful to implement!
     private Edge getEdge(int v1, int v2) {
+        for (LinkedList<Edge> edges: adjLists) {
+            for (Edge edge: edges) {
+                if (edge.from() == v1 && edge.to() == v2) {
+                    return edge;
+                }
+            }
+        }
         return null;
     }
 
@@ -87,6 +127,10 @@ public class Graph {
             this.edgeWeight = weight;
         }
 
+        public int from() {
+            return from;
+        }
+
         public int to() {
             return to;
         }
@@ -99,6 +143,19 @@ public class Graph {
             return "(" + from + "," + to + ",dist=" + edgeWeight + ")";
         }
 
+    }
+
+    private class distComparator implements Comparator<Integer> {
+        @Override
+        public int compare(Integer v1, Integer v2) {
+            if (vtodist.get(v1) > vtodist.get(v2)) {
+                return 1;
+            } else if (vtodist.get(v1).equals(vtodist.get(v2))) {
+                return 0;
+            } else {
+                return -1;
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -120,5 +177,7 @@ public class Graph {
         g2.addEdge(1, 2, 1);
         g2.addEdge(2, 3, 1);
         g2.addEdge(4, 3, 1);
+
+        int[] g1test = g1.dijkstras(2);
     }
 }
