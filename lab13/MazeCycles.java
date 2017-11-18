@@ -9,11 +9,10 @@ public class MazeCycles extends MazeExplorer {
     private int s;
     private int t;
     private boolean targetFound = false;
-    private Maze maze;
+    private boolean cycleFound = false;
 
     public MazeCycles(Maze m) {
         super(m);
-        maze = m;
         s = 0;
         t = maze.xyTo1D(maze.N(), maze.N());
         distTo[s] = 0;
@@ -22,10 +21,20 @@ public class MazeCycles extends MazeExplorer {
 
     @Override
     public void solve() {
-        dfs(s);
+        printMaze();
+        dfs(s, -1);
     }
 
-    public void dfs(int v) {
+    public void printMaze() {
+        for (int v = 0; v < t; v += 1) {
+            System.out.printf("%d\n", v);
+            for (int w : maze.adj(v)) {
+                System.out.printf("  %d\n", w);
+            }
+        }
+    }
+
+    public void dfs(int v, int prev) {
         marked[v] = true;
         announce();
 
@@ -36,14 +45,24 @@ public class MazeCycles extends MazeExplorer {
         if (targetFound) {
             return;
         }
+        System.out.printf("DFS Node: %d, Prev Node: %d\n", v, prev);
 
         for (int w : maze.adj(v)) {
-            if (!marked[w]) {
+            if (w == prev) continue;
+            System.out.printf("  Adjacent Node to (%d): %d\n", v, w);
+             if (marked[w]) {
+                edgeTo[w] = v;
+                distTo[w] = distTo[v] + 1;
+                System.out.println("  Cycle Here");
+                announce();
+                cycleFound = true;
+                return;
+            } else {
                 edgeTo[w] = v;
                 announce();
                 distTo[w] = distTo[v] + 1;
-                dfs(w);
-                if (targetFound) {
+                dfs(w, v);
+                if (targetFound || cycleFound) {
                     return;
                 }
             }
