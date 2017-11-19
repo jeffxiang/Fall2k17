@@ -1,9 +1,7 @@
 import org.junit.Test;
 import static org.junit.Assert.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 /** HW #8, Problem 3.
  *  @author Jeff Xiang
@@ -13,7 +11,6 @@ public class Intervals {
      *  <x,y> with x <= y, representing intervals of ints, this returns the
      *  total length covered by the union of the intervals. */
     public static int coveredLength(List<int[]> intervals) {
-        // REPLACE WITH APPROPRIATE STATEMENTS.
         return 0;
     }
 
