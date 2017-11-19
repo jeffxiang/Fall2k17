@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** HW #8, Problem 3.
- *  @author
+ *  @author Jeff Xiang
   */
 public class Intervals {
     /** Assuming that INTERVALS contains two-element arrays of integers,
