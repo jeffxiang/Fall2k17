@@ -48,17 +48,18 @@ public class MSTTest {
         int[][] E0 = Arrays.copyOf(E, E.length);
         int[][] E1 = Utils.deepCopy(E);
         int[][] mst = MST.mst(V, E);
+        System.out.print(mst.length);
         assertTrue(String.format("E input disturbed: (%s)", desc),
                    Arrays.equals(E, E0));
         assertTrue(String.format("Edges modified: (%s)", desc),
                    sameContents(E, E1));
+        assertEquals(String.format("Wrong minimal value (should be %d): (%s)",
+                mstWeight, desc),
+                mstWeight, Utils.totalWeight(mst));
         assertTrue(String.format("Not a subset: (%s)", desc),
                    isSubset(mst, E0));
         assertTrue(String.format("Result not a tree: (%s)", desc),
                    Utils.isTree(V, mst));
-        assertEquals(String.format("Wrong minimal value (should be %d): (%s)",
-                                   mstWeight, desc),
-                     mstWeight, Utils.totalWeight(mst));
     }
 
     private void check(int V, int minEdges, int maxWeight, long seed,
@@ -92,7 +93,7 @@ public class MSTTest {
         check(20000, 100000, 1000, 1923456, 2595553);
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void biggishTest3() {
         check(200000, 1000000, 100, 192345678, 2515034, BIG3);
     }
@@ -103,5 +104,4 @@ public class MSTTest {
 
     private static final int[][] BIG3 =
         Utils.randomConnectedGraph(200000, 1000000, 100, 192345678);
-
 }
